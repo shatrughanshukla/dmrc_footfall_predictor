@@ -1,0 +1,8 @@
+Open a New Terminal:
+Open a new terminal window or tab.
+
+Navigate to Your Project Directory:
+Use the cd command to navigate to the directory where your project is located.
+Run: cd ~/CODEEE/dmrc_footfall_predictor
+
+Run Your Application : python run.py
