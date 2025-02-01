@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DMRC Footfall Prediction Result</title>
+    <style>
+        /* Add your custom CSS here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b0e0e6;  /* Light sky blue */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+        p {
+            color: #495057;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ced4da;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Footfall Prediction</h1>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% else %}
+            <p>Station: {{ station }}</p>
+            <p>Day: {{ day }}</p>
+            <p>Time: {{ time }}</p>
+            <p>Predicted Footfall: {{ total_footfall }}</p>
+            <p>Footfall at Selected Time: {{ time_footfall }}</p>
+            <p>Number of Trains Needed: {{ num_trains_needed }}</p>
+            <p>Train Interval (minutes): {{ interval }}</p>
+            <h2>Additional Analysis</h2>
+            <p>Busiest Station: {{ busiest_station }}</p>
+            <p>Peak Hour: {{ peak_hour }}</p>
+            <h3>Travel Times from {{ station }}</h3>
+            <table>
+                <tr>
+                    <th>End Station</th>
+                    <th>Travel Time (minutes)</th>
+                </tr>
+                {% for info in travel_info %}
+                    <tr>
+                        <td>{{ info['End Station'] }}</td>
+                        <td>{{ info['Travel Time (minutes)'] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        <a href="/">Back</a>
+    </div>
+</body>
+</html>
