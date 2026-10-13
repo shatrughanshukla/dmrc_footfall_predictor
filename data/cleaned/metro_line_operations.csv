@@ -1,0 +1,12 @@
+Line,Coaches,Nominal_Capacity,Comfort_Capacity,Crush_Capacity,Min_Signaling_Headway_Min,Max_Policy_Headway_Min,Baseline_Peak_Headway_Min,Baseline_OffPeak_Headway_Min,Active_Fleet_Size,Turnaround_Time_Min,Technology
+Yellow Line,8,2400,1920,2880,2.1,8.0,2.3,5.0,64,150.0,Broad Gauge CATC
+Blue Line,8,2480,1984,2950,2.2,8.0,2.75,5.5,70,160.0,Broad Gauge CATC
+Blue Line branch,8,2480,1984,2950,3.5,12.0,5.5,8.0,12,45.0,Broad Gauge CATC
+Red Line,8,2000,1600,2400,2.5,10.0,3.5,6.0,39,110.0,Broad Gauge CATC
+Violet Line,6,1440,1152,1800,2.5,10.0,3.5,6.0,44,130.0,Standard Gauge CATC
+Pink Line,6,1440,1152,1750,2.0,10.0,4.0,6.5,52,145.0,Standard Gauge CBTC Driverless
+Magenta Line,6,1440,1152,1750,2.0,10.0,4.5,7.0,29,100.0,Standard Gauge CBTC Driverless
+Green Line,4,960,768,1200,3.0,12.0,5.0,8.0,24,80.0,Standard Gauge CATC
+Green Line branch,4,960,768,1200,4.0,15.0,7.0,10.0,6,25.0,Standard Gauge CATC
+Orange Line,6,1956,1560,2100,5.0,15.0,10.0,12.0,10,60.0,Airport Express Broad Gauge
+Grey Line,6,1440,1152,1750,5.0,15.0,7.5,12.0,4,25.0,Standard Gauge CATC

@@ -1,10 +1,12 @@
 Line,No of Coaches,Compartment Capacity,Total Capacity
-Red Line,8,250,2000
-Yellow Line,6,250,1500
+Yellow Line,8,300,2400
 Blue Line,8,310,2480
-Green Line,4,240,960
+Blue Line branch,8,310,2480
+Red Line,8,250,2000
 Violet Line,6,240,1440
-Orange Line,6,326,1956
 Pink Line,6,240,1440
 Magenta Line,6,240,1440
+Green Line,4,240,960
+Green Line branch,4,240,960
+Orange Line,6,326,1956
 Grey Line,6,240,1440

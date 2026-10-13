@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run DMRC Predictor (Flask)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run.py",
+      "console": "integratedTerminal",
+      "env": {
+        "FLASK_ENV": "development",
+        "FLASK_DEBUG": "1"
+      },
+      "jinja": true,
+      "justMyCode": true
+    }
+  ]
+}

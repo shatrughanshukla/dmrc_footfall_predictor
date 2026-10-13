@@ -1,0 +1,289 @@
+{
+  "metadata": {
+    "title": "Delhi Metro Interchange Line Demand Split Model",
+    "provenance": "ESTIMATED_MODEL",
+    "description": "Estimates passenger demand distribution across intersecting lines at interchange stations using corridor capacity, ridership volume weighting, and network centrality.",
+    "disclaimer": "This is an operational estimate model based on corridor throughput ratios."
+  },
+  "interchanges": {
+    "Kashmere Gate": {
+      "lines": [
+        "Red Line",
+        "Violet Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Violet Line": 0.3058,
+        "Red Line": 0.2804,
+        "Yellow Line": 0.4138
+      },
+      "explanation": "Demand distributed across 3 lines: Violet Line: 30%, Red Line: 28%, Yellow Line: 41%"
+    },
+    "Rajiv Chowk": {
+      "lines": [
+        "Blue Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.5154,
+        "Yellow Line": 0.4846
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 51%, Yellow Line: 48%"
+    },
+    "Inderlok": {
+      "lines": [
+        "Green Line",
+        "Red Line"
+      ],
+      "proportions": {
+        "Green Line": 0.4169,
+        "Red Line": 0.5831
+      },
+      "explanation": "Demand distributed across 2 lines: Green Line: 41%, Red Line: 58%"
+    },
+    "New Delhi": {
+      "lines": [
+        "Orange Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Orange Line": 0.2003,
+        "Yellow Line": 0.7997
+      },
+      "explanation": "Demand distributed across 2 lines: Orange Line: 20%, Yellow Line: 79%"
+    },
+    "Central Secretariat": {
+      "lines": [
+        "Violet Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Violet Line": 0.4249,
+        "Yellow Line": 0.5751
+      },
+      "explanation": "Demand distributed across 2 lines: Violet Line: 42%, Yellow Line: 57%"
+    },
+    "Dwarka Sector 21": {
+      "lines": [
+        "Blue Line",
+        "Orange Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.8094,
+        "Orange Line": 0.1906
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 80%, Orange Line: 19%"
+    },
+    "Kirti Nagar": {
+      "lines": [
+        "Blue Line",
+        "Green Line",
+        "Green Line branch"
+      ],
+      "proportions": {
+        "Green Line": 0.2588,
+        "Blue Line": 0.5679,
+        "Green Line branch": 0.1733
+      },
+      "explanation": "Demand distributed across 3 lines: Green Line: 25%, Blue Line: 56%, Green Line branch: 17%"
+    },
+    "Yamuna Bank": {
+      "lines": [
+        "Blue Line",
+        "Blue Line branch"
+      ],
+      "proportions": {
+        "Blue Line": 0.6757,
+        "Blue Line branch": 0.3243
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 67%, Blue Line branch: 32%"
+    },
+    "Ashok Park Main": {
+      "lines": [
+        "Green Line",
+        "Green Line branch"
+      ],
+      "proportions": {
+        "Green Line": 0.5988,
+        "Green Line branch": 0.4012
+      },
+      "explanation": "Demand distributed across 2 lines: Green Line: 59%, Green Line branch: 40%"
+    },
+    "Mandi House": {
+      "lines": [
+        "Blue Line",
+        "Violet Line"
+      ],
+      "proportions": {
+        "Violet Line": 0.41,
+        "Blue Line": 0.59
+      },
+      "explanation": "Demand distributed across 2 lines: Violet Line: 41%, Blue Line: 59%"
+    },
+    "Azadpur": {
+      "lines": [
+        "Pink Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Yellow Line": 0.5564,
+        "Pink Line": 0.4436
+      },
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 55%, Pink Line: 44%"
+    },
+    "Netaji Subhash Place": {
+      "lines": [
+        "Pink Line",
+        "Red Line"
+      ],
+      "proportions": {
+        "Red Line": 0.4594,
+        "Pink Line": 0.5406
+      },
+      "explanation": "Demand distributed across 2 lines: Red Line: 45%, Pink Line: 54%"
+    },
+    "Rajouri Garden": {
+      "lines": [
+        "Blue Line",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.5715,
+        "Pink Line": 0.4285
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 57%, Pink Line: 42%"
+    },
+    "INA": {
+      "lines": [
+        "Pink Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Yellow Line": 0.5564,
+        "Pink Line": 0.4436
+      },
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 55%, Pink Line: 44%"
+    },
+    "Lajpat Nagar": {
+      "lines": [
+        "Pink Line",
+        "Violet Line"
+      ],
+      "proportions": {
+        "Violet Line": 0.481,
+        "Pink Line": 0.519
+      },
+      "explanation": "Demand distributed across 2 lines: Violet Line: 48%, Pink Line: 51%"
+    },
+    "Janakpuri West": {
+      "lines": [
+        "Blue Line",
+        "Magenta Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.6322,
+        "Magenta Line": 0.3678
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 63%, Magenta Line: 36%"
+    },
+    "Hauz Khas": {
+      "lines": [
+        "Magenta Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Magenta Line": 0.3822,
+        "Yellow Line": 0.6178
+      },
+      "explanation": "Demand distributed across 2 lines: Magenta Line: 38%, Yellow Line: 61%"
+    },
+    "Kalkaji Mandir": {
+      "lines": [
+        "Magenta Line",
+        "Violet Line"
+      ],
+      "proportions": {
+        "Violet Line": 0.5443,
+        "Magenta Line": 0.4557
+      },
+      "explanation": "Demand distributed across 2 lines: Violet Line: 54%, Magenta Line: 45%"
+    },
+    "Botanical Garden": {
+      "lines": [
+        "Blue Line",
+        "Magenta Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.6322,
+        "Magenta Line": 0.3678
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 63%, Magenta Line: 36%"
+    },
+    "Anand Vihar ISBT": {
+      "lines": [
+        "Blue Line branch",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Blue Line branch": 0.3904,
+        "Pink Line": 0.6096
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line branch: 39%, Pink Line: 60%"
+    },
+    "Karkarduma": {
+      "lines": [
+        "Blue Line branch",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Blue Line branch": 0.3904,
+        "Pink Line": 0.6096
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line branch: 39%, Pink Line: 60%"
+    },
+    "Welcome": {
+      "lines": [
+        "Pink Line",
+        "Red Line"
+      ],
+      "proportions": {
+        "Red Line": 0.4594,
+        "Pink Line": 0.5406
+      },
+      "explanation": "Demand distributed across 2 lines: Red Line: 45%, Pink Line: 54%"
+    },
+    "Mayur Vihar -I": {
+      "lines": [
+        "Blue Line",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Blue Line": 0.5715,
+        "Pink Line": 0.4285
+      },
+      "explanation": "Demand distributed across 2 lines: Blue Line: 57%, Pink Line: 42%"
+    },
+    "Dwarka": {
+      "lines": [
+        "Blue Line",
+        "Grey Line"
+      ],
+      "proportions": {
+        "Grey Line": 0.1511,
+        "Blue Line": 0.8489
+      },
+      "explanation": "Demand distributed across 2 lines: Grey Line: 15%, Blue Line: 84%"
+    },
+    "Punjabi Bagh West": {
+      "lines": [
+        "Green Line",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Green Line": 0.378,
+        "Pink Line": 0.622
+      },
+      "explanation": "Demand distributed across 2 lines: Green Line: 37%, Pink Line: 62%"
+    }
+  }
+}

@@ -9,7 +9,7 @@ Ashok Park Main,Green Line,28.6716045,77.155291
 Ashram,Pink Line,28.5724231,77.2585979
 Azadpur,Yellow Line,28.7076568,77.1755473
 Badarpur Border,Violet Line,28.4904999,77.3040379
-Badkhal Mor,Violet Line,,
+Badkhal Mor,Violet Line,28.4079,77.307
 Bahadurgarh City,Green Line,28.6907847,76.9354851
 Barakhambha Road,Blue Line,28.6297676,77.2250046
 Bata Chowk,Violet Line,28.3858361,77.313462
@@ -25,8 +25,8 @@ Civil Lines,Yellow Line,28.6768508,77.2250299
 Dabri Mor-Janakpuri South,Magenta Line,28.6157555,77.085178
 Dashrath Puri,Magenta Line,28.6018751,77.0823561
 Delhi Aerocity,Orange Line,28.5487982,77.1208089
-Delhi Cantonment,Pink Line,28.593833099999998,77.13497891459929
-Delhi Gate,Violet Line,28.639203600000002,77.2407823
+Delhi Cantonment,Pink Line,28.5938331,77.13497891459929
+Delhi Gate,Violet Line,28.6392036,77.2407823
 Dhaula Kuan,Orange Line,28.5918905,77.1617034
 Dilshad Garden,Red Line,28.67588615,77.32143997586601
 Durgabai Deshmukh South Campus,Pink Line,28.5894384,77.1690817
@@ -64,7 +64,7 @@ INA,Yellow Line,28.57440755,77.21024148189088
 Inderlok,Red Line,28.6517178,77.2219388
 Indira Gandhi International Airport,Orange Line,28.55489735,77.08467458266915
 Indraprastha,Blue Line,28.6206019,77.249551
-IP Extension,Pink Line,28.628899099999998,77.31019787919774
+IP Extension,Pink Line,28.6288991,77.31019787919774
 ITO,Violet Line,28.6305091,77.2414363
 Jaffrabad,Pink Line,28.6826822,77.2748055
 Jahangirpuri,Yellow Line,28.7259717,77.162658
@@ -72,14 +72,14 @@ Jama Masjid,Violet Line,28.65001015,77.23767616659065
 Jamia Millia Islamia,Magenta Line,28.55849025,77.28116473551759
 Janakpuri East,Blue Line,28.633021,77.086757
 Janakpuri West,Blue Line,28.6289502,77.0779235
-Jangpura,Violet Line,28.582457050000002,77.2415000727384
+Jangpura,Violet Line,28.58245705,77.2415000727384
 Janpath,Violet Line,28.6088598,77.2181649
 Jasola Apollo,Violet Line,28.5384251,77.2830377
 Jasola Vihar Shaheen Bagh,Magenta Line,28.5458279,77.2966578
 Jawaharlal Nehru Stadium,Violet Line,28.58337705,77.23354040287734
 Jhandewalan,Blue Line,28.6443188,77.1999165
 Jhilmil,Red Line,28.6757033,77.31250457549734
-Johari Enclave,Pink Line,,
+Johari Enclave,Pink Line,28.7077,77.2917
 Jor Bagh,Yellow Line,28.58823925,77.21652774187173
 Kailash Colony,Violet Line,28.5530522,77.2429694
 Kalindi Kunj,Magenta Line,28.5452187,77.3059891
@@ -92,7 +92,7 @@ Kashmere Gate,Red Line,28.6517178,77.2219388
 Kaushambi,Blue Line branch,28.6453286,77.3243485
 Keshav Puram,Red Line,28.6889264,77.1616833
 Khan Market,Violet Line,28.6001354,77.22649064087364
-Kirti Nagar†,Blue Line,28.6532807,77.1417729
+Kirti Nagar,Blue Line,28.6532807,77.1417729
 Krishna Nagar,Pink Line,28.6578461,77.2901853
 Kohat Enclave,Red Line,28.6980415,77.1405393
 Lajpat Nagar,Violet Line,28.57060215,77.23653027838046
@@ -100,7 +100,7 @@ Lal Qila,Violet Line,17.920861950000003,77.52850191193579
 Laxmi Nagar,Blue Line branch,28.63055515,77.2776331681994
 Lok Kalyan Marg,Yellow Line,28.598385,77.2029964
 Madipur,Green Line,28.6764752,77.1193599
-Maharaja Surajmal Stadium,Green Line,,
+Maharaja Surajmal Stadium,Green Line,28.6793,77.0673
 Majlis Park,Pink Line,28.7244312,77.181964
 Major Mohit Sharma,Red Line,28.6776112,77.3581426
 Malviya Nagar,Yellow Line,28.5339201,77.2124474
@@ -115,7 +115,7 @@ Mayur Vihar Pocket I,Pink Line,28.6058619,77.2987023
 Mewala Maharajpur,Violet Line,28.4418747,77.3023001
 MG Road,Yellow Line,28.4794579,77.0804652
 Model Town,Yellow Line,28.7027136,77.1939912
-Mohan Estate,Violet Line,28.519589500000002,77.29458455034757
+Mohan Estate,Violet Line,28.5195895,77.29458455034757
 Mohan Nagar,Red Line,28.60631905,77.10608184860985
 Moolchand,Violet Line,28.5644043,77.2342783
 Moti Nagar,Blue Line,28.657859,77.1424288
@@ -131,12 +131,12 @@ Nawada,Blue Line,28.6202758,77.0450787
 Neelam Chowk Ajronda,Violet Line,28.3974824,77.3123599
 Nehru Enclave,Magenta Line,28.5460584,77.2515057
 Nehru Place,Violet Line,28.54925735,77.25295199508821
-Netaji Subhash Place,Red Line,28.696051750000002,77.15264042023938
+Netaji Subhash Place,Red Line,28.69605175,77.15264042023938
 New Ashok Nagar,Blue Line,28.5890885,77.3015085
 New Delhi,Yellow Line,28.6436415,77.2217373
-NHPC Chowk,Violet Line,,
+NHPC Chowk,Violet Line,28.4608,77.3094
 Nirman Vihar,Blue Line branch,28.63650605,77.28683488664558
-Noida City Centre,Blue Line,,
+Noida City Centre,Blue Line,28.5747,77.3561
 Noida Electronic City,Blue Line,28.5793538,77.293303
 Noida Sector 15,Blue Line,28.4808629,77.0848883
 Noida Sector 16,Blue Line,28.4808629,77.0848883
@@ -164,7 +164,7 @@ Preet Vihar,Blue Line branch,28.6414952,77.29537442892021
 Pul Bangash,Red Line,28.6663751,77.20752911898111
 Punjabi Bagh,Green Line,28.668945,77.1324614
 Punjabi Bagh West,Pink Line,28.6703201,77.1420875
-Qutab Minar,Yellow Line,,
+Qutab Minar,Yellow Line,28.5135,77.1859
 R.K.Puram,Magenta Line,28.5514261,77.1847012
 Raja Nahar Singh,Violet Line,28.3400192,77.3164281
 Raj Bagh,Red Line,28.6408602,77.2094999
@@ -186,7 +186,7 @@ Sarai,Violet Line,28.6517178,77.2219388
 Sarita Vihar,Violet Line,28.5286597,77.28839654806075
 Sarojini Nagar,Pink Line,28.5741575,77.1953703
 Satguru Ramsingh Marg,Green Line branch,28.6619327,77.1574772
-Sector 28,Violet Line,28.545256549999998,77.03257608771955
+Sector 28,Violet Line,28.54525655,77.03257608771955
 Seelampur,Red Line,28.6698302,77.26675403040142
 Shadipur,Blue Line,28.6516362,77.1582947
 Shahdara,Red Line,28.6734037,77.28974036006097
@@ -200,7 +200,7 @@ Shastri Park,Red Line,28.6682776,77.25039874373576
 Shiv Vihar,Pink Line,28.61753755,77.03543016986725
 Shivaji Park,Green Line,28.6750317,77.1304722
 Shivaji Stadium,Orange Line,28.6315087,77.2160589
-Shyam Park,Red Line,28.698807199999997,77.26846412516488
+Shyam Park,Red Line,28.6988072,77.26846412516488
 Sikandarpur,Yellow Line,28.4812704,77.092999
 Sir Vishweshwaraiah Moti Bagh,Pink Line,28.5785326,77.175741
 South,Pink Line,28.6517178,77.2219388
@@ -209,7 +209,7 @@ Sukhdev Vihar,Magenta Line,28.5597477,77.2749004
 Sultanpur,Yellow Line,28.4616582,76.8700852
 Supreme Court,Blue Line,28.6222879,77.23943396872133
 Tagore Garden,Blue Line,28.6437639,77.1128454
-Terminal 1-IGI Airport,Magenta Line,,
+Terminal 1-IGI Airport,Magenta Line,28.5568,77.1187
 Tikri Border,Green Line,28.6880254,76.9640828
 Tikri Kalan,Green Line,28.6868661,76.9772069
 Tilak Nagar,Blue Line,28.6365482,77.0964961

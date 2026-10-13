@@ -1,93 +1,296 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
 <head>
-    <title>DMRC Footfall Prediction Result</title>
-    <style>
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #b0e0e6;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            background-color: #ffffff;
-            margin-top: 50px;
-        }
-        h1 {
-            text-align: center;
-            color: #343a40;
-        }
-        p {
-            color: #495057;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ced4da;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #e9ecef;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        a:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario recommendation: {{ station }} - MetroInsights</title>
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem('metroflow-theme')||'light'}catch(e){}</script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/metro-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-polish.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Footfall Prediction</h1>
-        {% if error %}
-            <p style="color: red;">{{ error }}</p>
-        {% else %}
-            <p>Station: {{ station }}</p>
-            <p>Day: {{ day }}</p>
-            <p>Time: {{ time }}</p>
-            <p>Predicted Footfall: {{ total_footfall }}</p>
-            <p>Footfall at Selected Time: {{ time_footfall }}</p>
-            <p>Number of Trains Needed: {{ num_trains_needed }}</p>
-            <p>Train Interval (minutes): {{ interval }}</p>
-            <h2>Additional Analysis</h2>
-            <p>Busiest Station: {{ busiest_station }}</p>
-            <p>Peak Hour: {{ peak_hour }}</p>
-            <h3>Travel Times from {{ station }}</h3>
-            <table>
-                <tr>
-                    <th>End Station</th>
-                    <th>Travel Time (minutes)</th>
-                </tr>
-                {% for info in travel_info %}
+    <header class="dmrc-header">
+        <div class="header-content">
+            <div class="brand-wrapper">
+                <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 29V13a7 7 0 0 1 7-7h10a7 7 0 0 1 7 7v16H8Z"/><path d="M12 13h6v8h-6zm10 0h6v8h-6zM12 25h16M12 33l3-4m13 4-3-4"/><circle cx="14" cy="29" r="1"/><circle cx="26" cy="29" r="1"/></svg></span>
+                <div class="brand-text">
+                    <h1>MetroInsights <span>Scenario report</span></h1>
+                    <p>Station: {{ station }} · Simulation estimate</p>
+                </div>
+            </div>
+            <div class="header-actions"><a class="header-home-link" href="/">Overview</a><a href="/dashboard" class="btn-chip" style="font-weight: 700; text-decoration: none; padding: 8px 16px;">← Back to workspace</a><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Switch to dark theme"><span class="theme-icon" aria-hidden="true"></span><span class="theme-toggle-label">Dark mode</span></button></div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Station Summary Card -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h2 style="font-size: 1.8rem; color: #003366;">{{ station }}</h2>
+                    <p style="color: #64748b; font-size: 0.95rem;">
+                        {% if station_info.is_interchange %}
+                            Interchange Hub: {{ station_info.all_lines | join(', ') }}
+                        {% else %}
+                            Corridor: {{ station_info.line }}
+                        {% endif %}
+                        • Evaluated for <strong>{{ day }}, {{ date }} at {{ time }}</strong>
+                        • {{ calendar_context.day_status }}
+                        • Occasion: <strong>{{ calendar_context.occasion or 'No major occasion in the loaded calendar' }}</strong>
+                        • Forecast time band: <strong>{{ selected_hour_band }}</strong> (relative to this station/date profile)
+                    </p>
+                    {% if calendar_context.calendar_source %}<small>Occasion calendar: {{ calendar_context.calendar_source }}</small>{% endif %}
+                </div>
+                <div class="badge" style="background-color: {{ crowding_color }}; color: white; font-size: 0.9rem; padding: 8px 16px;">
+                    {{ crowding_badge }}
+                </div>
+            </div>
+
+            <!-- Operational Recommendation Narrative -->
+            <div class="explanation-box">
+                <div class="explanation-title">
+                    <span>📋 Scenario Schedule Recommendation:</span>
+                </div>
+                <div class="explanation-body">
+                    {{ explanation }}
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: #0284c7;">
+                <div class="kpi-title">Hourly Demand</div>
+                <div class="kpi-value">{{ hourly_footfall | int }}</div>
+                <div class="kpi-subtext">Interpolated Minute: {{ time_footfall | int }} riders</div>
+            </div>
+
+            <div class="kpi-card" style="border-left-color: #10b981;">
+                <div class="kpi-title">Recommended Headway</div>
+                <div class="kpi-value">{{ interval }}m</div>
+                <div class="kpi-subtext">Baseline: {{ existing_interval }}m</div>
+            </div>
+
+            <div class="kpi-card" style="border-left-color: #8b5cf6;">
+                <div class="kpi-title">Recommended Service</div>
+                <div class="kpi-value">{{ num_trains_needed }}</div>
+                <div class="kpi-subtext">Baseline: {{ existing_trains }} trains/hr</div>
+            </div>
+
+            <div class="kpi-card" style="border-left-color: #f59e0b;">
+                <div class="kpi-title">Capacity Utilization</div>
+                <div class="kpi-value">{{ capacity_utilization }}%</div>
+                <div class="kpi-subtext">Comfort Clearance Budget</div>
+            </div>
+
+            <div class="kpi-card" style="border-left-color: #ef4444;">
+                <div class="kpi-title">Avg Passenger Wait</div>
+                <div class="kpi-value">{{ avg_wait_time }} min</div>
+                <div class="kpi-subtext">Random Arrival Standard</div>
+            </div>
+        </div>
+
+        <!-- Line Breakdown for Interchanges & Single Corridors -->
+        <div class="card">
+            <div class="card-title">
+                <span>{% if schedule_res.is_interchange %}Interchange Line Demand Distribution{% else %}Corridor Demand & Service Allocation{% endif %}</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
+                {% if schedule_res.is_interchange %}
+                    Demand distributed across intersecting lines based on corridor capacity and network centrality weighting.
+                {% else %}
+                    Full passenger demand allocated to this single-line corridor.
+                {% endif %}
+            </p>
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td>{{ info['End Station'] }}</td>
-                        <td>{{ info['Travel Time (minutes)'] }}</td>
+                        <th>Corridor</th>
+                        <th>Demand Share</th>
+                        <th>Hourly Demand</th>
+                        <th>Baseline Headway</th>
+                        <th>Recommended Headway</th>
+                        <th>Trains / Hour</th>
+                        <th>Capacity Utilization</th>
+                        <th>Action</th>
                     </tr>
-                {% endfor %}
+                </thead>
+                <tbody>
+                    {% for l in schedule_res.line_recommendations %}
+                    {% set color = '#dc2626' if 'Red' in l.line else ('#eab308' if 'Yellow' in l.line else ('#2563eb' if 'Blue' in l.line else ('#16a34a' if 'Green' in l.line else ('#7c3aed' if 'Violet' in l.line else ('#ec4899' if 'Pink' in l.line else ('#a855f7' if 'Magenta' in l.line else ('#ea580c' if 'Orange' in l.line else '#64748b'))))))) %}
+                    <tr>
+                        <td>
+                            <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background-color:{{ color }}; vertical-align:middle; margin-right:8px;"></span>
+                            <strong style="color: {{ '#b45309' if color == '#eab308' else color }};">{{ l.line }}</strong>
+                        </td>
+                        <td><strong>{{ l.demand_share_pct }}%</strong></td>
+                        <td><strong>{{ l.line_demand | int }}</strong> riders/hr</td>
+                        <td>{{ l.existing_headway_min }} min</td>
+                        <td><strong style="color: #0284c7;">{{ l.recommended_headway_min }} min</strong></td>
+                        <td>{{ l.recommended_trains_per_hour }} tph</td>
+                        <td>
+                            <span class="badge" style="background: {{ l.crowding_color }}; color: white;">{{ l.capacity_utilization_pct }}%</span>
+                        </td>
+                        <td>{{ l.status_action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
-        {% endif %}
-        <a href="/">Back</a>
+        </div>
+
+        <!-- Operating-Hours Passenger Demand Profile Curve -->
+        <div class="card">
+            <div class="card-title">
+                <span>Passenger demand by operating hour</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="demandResultChartCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Travel Times to Connected Stations (All Destinations) -->
+        <div class="card">
+            <div class="card-title">
+                <span>Network Travel Times from {{ station }} (<span id="resultTravelCount" style="color: #0284c7;">{{ travel_info | length }}</span> Stations)</span>
+                <span class="badge badge-verified">Dijkstra Shortest Path</span>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="resultTravelSearch" class="form-control" placeholder="🔍 Search any destination station (e.g. Kashmere Gate, Inderlok, Noida, Dwarka)...">
+            </div>
+            <div style="max-height: 480px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px;">
+                <table class="data-table" id="resultTravelTable" style="margin-top: 0;">
+                    <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2;">
+                        <tr>
+                            <th>Destination Station</th>
+                            <th>Corridor Line</th>
+                            <th>Estimated Transit Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for info in travel_info %}
+                        {% set dest_line = info['Line'] if 'Line' in info else 'Metro Network' %}
+                        {% set color = '#dc2626' if 'Red' in dest_line else ('#eab308' if 'Yellow' in dest_line else ('#2563eb' if 'Blue' in dest_line else ('#16a34a' if 'Green' in dest_line else ('#7c3aed' if 'Violet' in dest_line else ('#ec4899' if 'Pink' in dest_line else ('#a855f7' if 'Magenta' in dest_line else ('#ea580c' if 'Orange' in dest_line else '#64748b'))))))) %}
+                        <tr class="travel-row">
+                            <td class="dest-name"><strong>{{ info['End Station'] }}</strong></td>
+                            <td class="dest-line">
+                                <span class="badge" style="background-color: {{ color }}; color: white; font-size: 0.75rem;">
+                                    {{ dest_line }}
+                                </span>
+                            </td>
+                            <td><strong style="color: #0284c7;">{{ info['Travel Time (minutes)'] }} mins</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            // Live search for destination stations
+            const searchInput = document.getElementById('resultTravelSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const q = this.value.toLowerCase().trim();
+                    const rows = document.querySelectorAll('.travel-row');
+                    let visibleCount = 0;
+                    rows.forEach(r => {
+                        const name = r.querySelector('.dest-name').textContent.toLowerCase();
+                        const line = r.querySelector('.dest-line').textContent.toLowerCase();
+                        if (!q || name.includes(q) || line.includes(q)) {
+                            r.style.display = '';
+                            visibleCount++;
+                        } else {
+                            r.style.display = 'none';
+                        }
+                    });
+                    const countEl = document.getElementById('resultTravelCount');
+                    if (countEl) countEl.textContent = visibleCount;
+                });
+            }
+        </script>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="/" class="btn-primary" style="display: inline-block; width: auto; padding: 12px 30px; text-decoration: none;">← Return to Dispatch Dashboard</a>
+        </div>
     </div>
+
+    <script>
+        const profile = {{ profile_24h | tojson | safe }};
+        const ctx = document.getElementById('demandResultChartCanvas');
+        if (ctx && profile) {
+            const datasets = [
+                {
+                    label: 'Simulated demand estimate (model trained on synthetic data)',
+                    data: profile.predicted,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.08)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#0284c7'
+                },
+                {
+                    label: 'Synthetic training-period baseline mean',
+                    data: profile.historical,
+                    borderColor: '#94a3b8',
+                    borderWidth: 1.8,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.35,
+                    pointRadius: 2
+                }
+            ];
+
+            if (profile.line_curves && Object.keys(profile.line_curves).length > 1) {
+                const METRO_LINE_COLORS = {
+                    'Red Line': '#dc2626',
+                    'Yellow Line': '#eab308',
+                    'Blue Line': '#2563eb',
+                    'Blue Line branch': '#0284c7',
+                    'Green Line': '#16a34a',
+                    'Green Line branch': '#22c55e',
+                    'Violet Line': '#7c3aed',
+                    'Pink Line': '#ec4899',
+                    'Magenta Line': '#a855f7',
+                    'Orange Line': '#ea580c',
+                    'Grey Line': '#64748b'
+                };
+                for (const [lineName, curve] of Object.entries(profile.line_curves)) {
+                    const color = METRO_LINE_COLORS[lineName] || '#0284c7';
+                    datasets.push({
+                        label: `${lineName} Demand Trend`,
+                        data: curve,
+                        borderColor: color,
+                        borderWidth: 2,
+                        borderDash: [4, 2],
+                        fill: false,
+                        tension: 0.35,
+                        pointRadius: 2,
+                        pointBackgroundColor: color
+                    });
+                }
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: profile.labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Passengers / Hour' } },
+                        x: { title: { display: true, text: 'Operating Hour' } }
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
 </body>
 </html>

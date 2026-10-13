@@ -1,121 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
 <head>
-    <title>DMRC Footfall Predictor</title>
-    <style>
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #b0e0e6; 
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            background-color: #ffffff;
-            margin-top: 50px;
-            text-align: center;
-            position: relative;
-        }
-        h1 {
-            color: #343a40;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .logo {
-            width: 50px; /* Set a fixed width */
-            height: auto; /* Allow height to adjust automatically */
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            color: #495057;
-        }
-        input, select {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        input[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .loader {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #007bff;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin: auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .animation {
-            width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetroInsights - Delhi Metro Forecasting</title>
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem('metroflow-theme')||'light'}catch(e){}</script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/metro-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-polish.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
-        function validateForm() {
-            let day = document.getElementById('day').value;
-            let time = document.getElementById('time').value;
-            if (!day || !time) {
-                alert('Please select a day and time.');
-                return false;
-            }
-            document.getElementById('loader').style.display = 'block';
-            return true;
-        }
+        window.STATIONS_META = {{ stations_meta | tojson | safe }};
     </script>
 </head>
 <body>
-    <div class="container">
-        <img src="{{ url_for('static', filename='dmrc_logo.png') }}" alt="DMRC Logo" class="logo">
-        <h1>DMRC Footfall Predictor</h1>
-        <form action="/get_footfall" method="post" onsubmit="return validateForm()">
-            <label for="station">Station:</label>
-            <select name="station" id="station">
-                {% for station in stations %}
-                    <option value="{{ station }}">{{ station }}</option>
-                {% endfor %}
-            </select><br>
-            <label for="day">Day:</label>
-            <select name="day" id="day">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select><br>
-            <label for="time">Time:</label>
-            <input type="time" id="time" name="time"><br>
-            <input type="submit" value="Submit">
-        </form>
-        <div id="loader" class="loader"></div>
-        <img src="{{ url_for('static', filename='animation.gif') }}" alt="Animation" class="animation">
+    <!-- Header -->
+    <header class="dmrc-header">
+        <div class="header-content">
+            <div class="brand-wrapper">
+                <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 29V13a7 7 0 0 1 7-7h10a7 7 0 0 1 7 7v16H8Z"/><path d="M12 13h6v8h-6zm10 0h6v8h-6zM12 25h16M12 33l3-4m13 4-3-4"/><circle cx="14" cy="29" r="1"/><circle cx="26" cy="29" r="1"/></svg></span>
+                <div class="brand-text">
+                    <h1>MetroInsights <span>Forecasting workspace</span></h1>
+                    <p>Delhi Metro demand scenarios · Planning workspace</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="header-home-link" href="/">Overview</a>
+                <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Switch to dark theme"><span class="theme-icon" aria-hidden="true"></span><span class="theme-toggle-label">Dark mode</span></button>
+                <div class="status-pill">
+                <span class="live-dot"></span>
+                <span>Simulation mode</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+
+        <div class="dashboard-grid">
+            <!-- Left Column: Controls & Model Info -->
+            <div class="controls-column">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Forecast setup</span>
+                        <span id="loadingIndicator" style="display: none; font-size: 0.75rem; color: #0284c7;">Calculating...</span>
+                    </div>
+
+                    <form action="/get_footfall" method="post" id="predictionForm">
+                        <!-- Station Selection -->
+                        <div class="form-group">
+                            <label for="station">Select Metro Station</label>
+                            <select name="station" id="station" class="form-select">
+                                {% for st in stations %}
+                                    <option value="{{ st }}" {% if st == default_station %}selected{% endif %}>
+                                        {{ st }}{% if stations_meta[st].is_interchange %} ⇄ [Interchange]{% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Date Selection -->
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" name="date" class="form-control" value="{{ default_date }}" min="{{ today_date }}">
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-chip btn-preset-day active" data-preset="today">Today</button>
+                                <button type="button" class="btn-chip btn-preset-day" data-preset="weekday">Next weekday</button>
+                                <button type="button" class="btn-chip btn-preset-day" data-preset="saturday">Saturday</button>
+                                <button type="button" class="btn-chip btn-preset-day" data-preset="sunday">Sunday</button>
+                            </div>
+                        </div>
+
+                        <!-- Time Selection & Slider -->
+                        <div class="form-group">
+                            <label for="time">Operating Time: <span id="selectedTimeLabel" style="color: #0284c7; font-weight: 700;">{{ default_time }}</span></label>
+                            <input type="time" id="time" name="time" class="form-control" value="{{ default_time }}">
+                            <div class="slider-container">
+                                <input type="range" id="timeSlider" min="5" max="23" value="9" step="1" style="width: 100%;">
+                                <div class="slider-labels">
+                                    <span>05:00</span>
+                                    <span>09:00 (Rush)</span>
+                                    <span>14:00</span>
+                                    <span>18:00 (Rush)</span>
+                                    <span>23:00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Line Selection (for interchange stations) -->
+                        <div class="form-group" id="lineSelectGroup" style="display: none;">
+                            <label for="lineSelect">Corridor Focus</label>
+                            <select name="line" id="lineSelect" class="form-select">
+                                <option value="">All Lines (Station Overview)</option>
+                            </select>
+                        </div>
+
+                        <div id="calendarContext" class="calendar-context" aria-live="polite">Loading date, workday, occasion, and demand period…</div>
+                        <p id="forecastFormStatus" class="forecast-form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Live Results & Analytics -->
+            <div class="results-column">
+                <!-- Station Title & Summary -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h2 id="dispStationName" style="font-size: 1.5rem; color: #003366;">Rajiv Chowk</h2>
+                            <p id="dispStationLine" style="color: #64748b; font-size: 0.9rem;">Interchange Hub (Yellow Line, Blue Line)</p>
+                            <p id="dispForecastContext" class="forecast-context-line"></p>
+                        </div>
+                    </div>
+
+                    <!-- Operational Recommendation Narrative -->
+                    <div class="explanation-box">
+                        <div class="explanation-title">
+                            <span><svg class="section-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5h10v13H5zM8 6.5h4M8 9.5h4M8 12.5h2"/><path d="M7 2v3m6-3v3"/></svg>Service recommendation</span>
+                        </div>
+                        <div id="dispExplanationText" class="explanation-body">
+                            Existing baseline timetable comfortably handles projected passenger demand.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card" style="border-left-color: #0284c7;">
+                        <div class="kpi-title">Estimated passengers / hour</div>
+                        <div id="dispFootfall" class="kpi-value">6,780</div>
+                        <div id="dispInstantFootfall" class="kpi-subtext">Interpolated Minute: 6,780</div>
+                    </div>
+
+                    <div class="kpi-card" style="border-left-color: #10b981;">
+                        <div class="kpi-title">Recommended Headway</div>
+                        <div id="dispRecHeadway" class="kpi-value">2.3m</div>
+                        <div id="dispExistingHeadway" class="kpi-subtext">Baseline: 2.3m (Peak)</div>
+                    </div>
+
+                    <div class="kpi-card" style="border-left-color: #8b5cf6;">
+                        <div class="kpi-title">Recommended Service</div>
+                        <div id="dispRecTrains" class="kpi-value">26.1</div>
+                        <div id="dispExistingTrains" class="kpi-subtext">Baseline: 26.1 trains/hr</div>
+                    </div>
+
+                    <div class="kpi-card" style="border-left-color: #f59e0b;">
+                        <div class="kpi-title">Capacity Utilization</div>
+                        <div id="dispUtilization" class="kpi-value">20.7%</div>
+                        <div id="dispUtilizationContext" class="kpi-subtext">Estimated under the recommended service plan</div>
+                    </div>
+
+                    <div class="kpi-card" style="border-left-color: #ef4444;">
+                        <div class="kpi-title">Avg Passenger Wait</div>
+                        <div id="dispWaitTime" class="kpi-value">1.2 min</div>
+                        <div id="dispFleetDeployed" class="kpi-subtext">Active Fleet: 64/64 trains</div>
+                    </div>
+                </div>
+
+                <!-- Operating-Hours Passenger Demand Curve -->
+                <div class="card">
+                    <div class="card-title">
+                        <span>Passenger demand by operating hour</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="demandChartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Metro Line Demand Distribution (Interchanges and Single Lines) -->
+                <div class="card" id="interchangeSection">
+                    <div class="card-title">
+                        <span id="interchangeSectionTitle">Interchange Line Demand Distribution</span>
+                    </div>
+                    <p id="interchangeSectionDesc" style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;">
+                        Demand distributed across intersecting lines using corridor capacity and network centrality weighting.
+                    </p>
+                    <div style="display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: center;">
+                        <div style="height: 200px;">
+                            <canvas id="lineChartCanvas"></canvas>
+                        </div>
+                        <div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Corridor</th>
+                                        <th>Share</th>
+                                        <th>Demand</th>
+                                        <th>Base Headway</th>
+                                        <th>Recommended</th>
+                                        <th>Utilization</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lineBreakdownTableBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connected Station Travel Times (Dijkstra) -->
+                <div class="card">
+                    <div class="card-title travel-card-title">
+                        <div class="travel-title-group"><span>Travel times from</span><strong id="travelOriginName">Rajiv Chowk</strong></div>
+                        <div class="travel-header-meta"><span class="travel-count"><span id="travelStationCount">226</span> destinations</span><span class="network-time-badge">Shortest path estimate</span></div>
+                    </div>
+                    <div class="travel-search-wrap">
+                        <label class="travel-search-field"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><input type="search" id="travelSearchInput" class="form-control" placeholder="Search a destination or corridor" aria-label="Search destination stations or corridors"></label>
+                    </div>
+                    <div class="travel-table-wrap">
+                        <table class="data-table travel-table">
+                            <thead>
+                                <tr>
+                                    <th>Destination station</th>
+                                    <th>Station corridor</th>
+                                    <th>Estimated travel time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="travelTimesTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
 </body>
 </html>

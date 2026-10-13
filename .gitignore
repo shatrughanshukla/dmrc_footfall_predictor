@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.py[cod]
+
+# Generated training data; regenerate with pipeline/02_generate_calibrated_dataset.py
+csvFiles/dmrc_footfall_data.csv
+data/synthetic/dmrc_calibrated_footfall.csv
