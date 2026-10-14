@@ -1,9 +1,9 @@
 {
   "evaluation_dataset": {
     "name": "Delhi Metro Synthetic Scenario Test Split",
-    "total_records": 3153696,
-    "train_samples": 2742156,
-    "test_samples": 411540,
+    "total_records": 3361176,
+    "train_samples": 2922561,
+    "test_samples": 438615,
     "split_date": "2026-10-01",
     "validation_method": "Chronological Out-of-Time Validation (future festival quarter; prior-date history features)"
   },
@@ -11,37 +11,37 @@
     "baseline_station_mean": {
       "name": "Station Overall Mean Baseline",
       "metrics": {
-        "MAE": 318.74,
-        "RMSE": 504.41,
-        "R2": 0.5505,
-        "MAPE_%": 95.83
+        "MAE": 298.74,
+        "RMSE": 470.39,
+        "R2": 0.5465,
+        "MAPE_%": 95.64
       }
     },
     "baseline_historical_hour_day": {
       "name": "Historical (Station, DayOfWeek, Hour) Mean Baseline",
       "metrics": {
-        "MAE": 64.01,
-        "RMSE": 144.71,
-        "R2": 0.963,
-        "MAPE_%": 9.01
+        "MAE": 60.25,
+        "RMSE": 134.87,
+        "R2": 0.9627,
+        "MAPE_%": 9.05
       }
     },
     "baseline_ridge_regression": {
       "name": "Ridge Regression Baseline",
       "metrics": {
-        "MAE": 56.92,
-        "RMSE": 137.16,
-        "R2": 0.9668,
-        "MAPE_%": 11.9
+        "MAE": 53.67,
+        "RMSE": 127.84,
+        "R2": 0.9665,
+        "MAPE_%": 11.92
       }
     },
     "hist_gradient_boosting": {
       "name": "Tuned HistGradientBoostingRegressor (Production ML)",
       "metrics": {
-        "MAE": 27.9,
-        "RMSE": 54.82,
-        "R2": 0.9947,
-        "MAPE_%": 5.16
+        "MAE": 26.58,
+        "RMSE": 51.1,
+        "R2": 0.9946,
+        "MAPE_%": 5.18
       }
     }
   },

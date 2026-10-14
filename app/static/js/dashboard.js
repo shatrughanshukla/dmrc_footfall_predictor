@@ -305,7 +305,7 @@ function renderDashboard(data) {
     }
 
     try {
-        // Render Travel Times table (All 226 stations)
+        // Render travel-time estimates for all reachable destination stations.
         renderTravelTimes(data.travel_times);
     } catch (e) {
         console.error('Error rendering travel times:', e);

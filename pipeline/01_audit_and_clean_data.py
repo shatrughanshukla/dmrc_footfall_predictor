@@ -18,7 +18,7 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, 'app'))
 
-from network_topology import INTERCHANGES, LINES  # noqa: E402
+from network_topology import INTERCHANGES, line_route_segments  # noqa: E402
 
 RAW_METRO_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'DELHI_METRO_DATA.csv')
 CLEANED_STATIONS_PATH = os.path.join(BASE_DIR, 'data', 'cleaned', 'stations_cleaned.csv')
@@ -222,18 +222,19 @@ def clean_stations():
     all_lines_list = []
     num_lines_list = []
     
+    station_lines = {}
+    for line, segments in line_route_segments().items():
+        for stops in segments:
+            for station in stops:
+                station_lines.setdefault(station, set()).add(line)
+
     for _, row in df.iterrows():
         st = row['Station']
         primary_line = row['Line']
-        if st in INTERCHANGES:
-            lines = sorted(list(INTERCHANGES[st]))
-            is_interchange_list.append(True)
-            all_lines_list.append(", ".join(lines))
-            num_lines_list.append(len(lines))
-        else:
-            is_interchange_list.append(False)
-            all_lines_list.append(primary_line)
-            num_lines_list.append(1)
+        lines = sorted(station_lines.get(st, INTERCHANGES.get(st, {primary_line})))
+        is_interchange_list.append(len(lines) > 1)
+        all_lines_list.append(", ".join(lines))
+        num_lines_list.append(len(lines))
             
     df['Is_Interchange'] = is_interchange_list
     df['All_Lines'] = all_lines_list

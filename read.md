@@ -1,6 +1,6 @@
 # Delhi Metro Passenger Demand Forecasting & Train Scheduling Optimization System
 
-A simulation and dashboard prototype covering **228 station records** and **11 project-defined corridors**. It does not currently contain observed DMRC station-by-hour passenger data, verified operational schedules, or verified rolling-stock constraints. See [DATA_AUDIT.md](DATA_AUDIT.md) before interpreting any forecast or recommendation.
+A simulation and dashboard prototype covering **243 unique station records** and **11 project-defined corridors**, including operational extensions through 2026. DMRC's published 271 line-station count includes shared interchange stations on more than one line; this project stores each physical station once. It does not currently contain observed DMRC station-by-hour passenger data, verified operational schedules, or verified rolling-stock constraints. See [DATA_AUDIT.md](DATA_AUDIT.md) before interpreting any forecast or recommendation.
 
 Rather than displaying arbitrary passenger counts or naive formulas, this system:
 1. **Demonstrates station-wise demand prediction** using a Gradient Boosted Tree model trained on generated synthetic demand. Its reported scores measure agreement with that synthetic generator only, not actual DMRC footfall.
@@ -19,7 +19,7 @@ Rather than displaying arbitrary passenger counts or naive formulas, this system
 * Uses code-authored demand weights and curves. These values are not verified against station-level observed DMRC ridership; do not use them as actual counts.
 
 ### 2. Interchange Line-Wise Demand Breakdown
-* For the 25 multi-line interchange hubs, models passenger distribution based on corridor passenger throughput, train rake capacity, and network centrality.
+* For the modeled multi-line interchange hubs, estimates passenger distribution based on corridor passenger throughput, train rake capacity, and network centrality.
 * Prominently tagged as `[ESTIMATED LINE DEMAND]` to maintain absolute operational transparency.
 
 ### 3. Realistic Train Frequency & Headway Optimization
@@ -30,7 +30,7 @@ Rather than displaying arbitrary passenger counts or naive formulas, this system
 * **Dispatch Practical Intervals**: Rounds headways to real operational dispatch steps (e.g., 2.3 min, 2.5 min, 2.75 min, 3.0 min, 3.5 min, 5.0 min, etc.).
 
 ### 4. Network Topology & Dijkstra Route Graph
-* Line-expanded network topology graph with 254 line-nodes and 25 interchanges.
+* Line-expanded network topology graph with station-and-line nodes and modeled interchanges.
 * Dijkstra multi-source shortest path calculation accounting for inter-station track travel and platform transfer penalties.
 
 ### 5. Interactive Transit Operations Dashboard
@@ -49,13 +49,13 @@ Rather than displaying arbitrary passenger counts or naive formulas, this system
 | :--- | :--- | :--- |
 | 🟡 **Unverified project inputs** | Hand-authored route and operations tables. | Station topology and `metro_line_operations.csv`; requires external source verification. |
 | 🟠 **Model estimate on synthetic data** | ML output learned from the project's generated dataset. | Forecaster; not validated against actual passenger counts. |
-| 🔵 **Synthetic simulation** | Generated demand scenarios, separate from observed data. | `dmrc_calibrated_footfall.csv` (728 days × 19 hours × 228 stations). |
+| 🔵 **Synthetic simulation** | Generated demand scenarios, separate from observed data. | `dmrc_calibrated_footfall.csv` (728 days × 19 hours × 243 stations = 3,361,176 records). |
 
 ---
 
 ## Synthetic Holdout Metrics
 
-The active model, metadata, and evaluation report have been regenerated together from the included 728-day synthetic dataset (2025-01-06 through 2027-01-03). The 23-feature `HistGradientBoostingRegressor` achieved MAE 27.90 riders/hour, RMSE 54.82, and R² 0.9947 on the chronological holdout beginning 2026-10-01 (411,540 rows). This is a holdout against generated scenarios, not real passenger counts, and should not be interpreted as real-world accuracy. Holiday/occasion impacts are assumed scenario effects until measured from observed data. See `DATA_AUDIT.md` and `models/evaluation_metrics.json` for limitations and baseline comparisons.
+The active model, metadata, and evaluation report have been regenerated together from the 728-day synthetic dataset (2025-01-06 through 2027-01-03). The 23-feature `HistGradientBoostingRegressor` achieved MAE 26.58 passengers/hour, RMSE 51.10 passengers/hour, and R² 0.9946 on the chronological holdout beginning 2026-10-01 (438,615 rows). This is a holdout against generated scenarios, not real passenger counts, and should not be interpreted as real-world accuracy. Holiday/occasion impacts are assumed scenario effects until measured from observed data. See `DATA_AUDIT.md` and `models/evaluation_metrics.json` for limitations and baseline comparisons.
 
 ---
 

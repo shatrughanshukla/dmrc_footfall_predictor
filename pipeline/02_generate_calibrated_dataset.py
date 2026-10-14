@@ -4,7 +4,7 @@ Pipeline Step 2: Annual Calibrated Footfall Dataset & Line Distribution Generati
 Features:
 1. Expands dataset to a two-year synthetic scenario period:
    - 104 weeks (728 days, 2025-01-06 to 2027-01-03)
-   - 19 operating hours (05:00 to 23:00) across 228 stations
+   - 19 operating hours (05:00 to 23:00) across the cleaned station roster
 2. Simulates assumed Delhi transit patterns:
    - Calendar holidays & festivals (Republic Day, Holi, Independence Day,
      Raksha Bandhan peak, Diwali, Chhath, Christmas, New Year).
@@ -53,7 +53,7 @@ STATION_TYPOLOGIES = {
     "Noida Sector 16": "COMMERCIAL_OFFICE",
     "Noida Sector 62": "COMMERCIAL_OFFICE",
     "Noida Electronic City": "COMMERCIAL_OFFICE",
-    "HUDA City Centre": "COMMERCIAL_OFFICE",
+    "Millennium City Centre Gurugram": "COMMERCIAL_OFFICE",
     "IFFCO Chowk": "COMMERCIAL_OFFICE",
     "MG Road": "COMMERCIAL_OFFICE",
     "Okhla NSIC": "COMMERCIAL_OFFICE",
@@ -150,7 +150,7 @@ NAMED_HUB_WEIGHT = {
     "Hauz Khas": 1.6,
     "Central Secretariat": 1.5,
     "Janakpuri West": 1.5,
-    "HUDA City Centre": 1.4,
+    "Millennium City Centre Gurugram": 1.4,
     "Chandni Chowk": 1.3,
     "Noida Sector 18": 1.3,
 }

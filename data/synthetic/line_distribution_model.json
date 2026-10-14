@@ -13,11 +13,11 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Violet Line": 0.3058,
-        "Red Line": 0.2804,
-        "Yellow Line": 0.4138
+        "Red Line": 0.2795,
+        "Yellow Line": 0.4156,
+        "Violet Line": 0.3049
       },
-      "explanation": "Demand distributed across 3 lines: Violet Line: 30%, Red Line: 28%, Yellow Line: 41%"
+      "explanation": "Demand distributed across 3 lines: Red Line: 27%, Yellow Line: 41%, Violet Line: 30%"
     },
     "Rajiv Chowk": {
       "lines": [
@@ -25,10 +25,10 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Blue Line": 0.5154,
-        "Yellow Line": 0.4846
+        "Yellow Line": 0.4864,
+        "Blue Line": 0.5136
       },
-      "explanation": "Demand distributed across 2 lines: Blue Line: 51%, Yellow Line: 48%"
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 48%, Blue Line: 51%"
     },
     "Inderlok": {
       "lines": [
@@ -36,10 +36,10 @@
         "Red Line"
       ],
       "proportions": {
-        "Green Line": 0.4169,
-        "Red Line": 0.5831
+        "Red Line": 0.5831,
+        "Green Line": 0.4169
       },
-      "explanation": "Demand distributed across 2 lines: Green Line: 41%, Red Line: 58%"
+      "explanation": "Demand distributed across 2 lines: Red Line: 58%, Green Line: 41%"
     },
     "New Delhi": {
       "lines": [
@@ -47,10 +47,10 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Orange Line": 0.2003,
-        "Yellow Line": 0.7997
+        "Yellow Line": 0.7993,
+        "Orange Line": 0.2007
       },
-      "explanation": "Demand distributed across 2 lines: Orange Line: 20%, Yellow Line: 79%"
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 79%, Orange Line: 20%"
     },
     "Central Secretariat": {
       "lines": [
@@ -58,10 +58,10 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Violet Line": 0.4249,
-        "Yellow Line": 0.5751
+        "Yellow Line": 0.5768,
+        "Violet Line": 0.4232
       },
-      "explanation": "Demand distributed across 2 lines: Violet Line: 42%, Yellow Line: 57%"
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 57%, Violet Line: 42%"
     },
     "Dwarka Sector 21": {
       "lines": [
@@ -69,8 +69,8 @@
         "Orange Line"
       ],
       "proportions": {
-        "Blue Line": 0.8094,
-        "Orange Line": 0.1906
+        "Blue Line": 0.8079,
+        "Orange Line": 0.1921
       },
       "explanation": "Demand distributed across 2 lines: Blue Line: 80%, Orange Line: 19%"
     },
@@ -81,11 +81,11 @@
         "Green Line branch"
       ],
       "proportions": {
-        "Green Line": 0.2588,
-        "Blue Line": 0.5679,
+        "Blue Line": 0.568,
+        "Green Line": 0.2587,
         "Green Line branch": 0.1733
       },
-      "explanation": "Demand distributed across 3 lines: Green Line: 25%, Blue Line: 56%, Green Line branch: 17%"
+      "explanation": "Demand distributed across 3 lines: Blue Line: 56%, Green Line: 25%, Green Line branch: 17%"
     },
     "Yamuna Bank": {
       "lines": [
@@ -115,10 +115,10 @@
         "Violet Line"
       ],
       "proportions": {
-        "Violet Line": 0.41,
-        "Blue Line": 0.59
+        "Blue Line": 0.59,
+        "Violet Line": 0.41
       },
-      "explanation": "Demand distributed across 2 lines: Violet Line: 41%, Blue Line: 59%"
+      "explanation": "Demand distributed across 2 lines: Blue Line: 59%, Violet Line: 41%"
     },
     "Azadpur": {
       "lines": [
@@ -126,8 +126,8 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Yellow Line": 0.5564,
-        "Pink Line": 0.4436
+        "Yellow Line": 0.5582,
+        "Pink Line": 0.4418
       },
       "explanation": "Demand distributed across 2 lines: Yellow Line: 55%, Pink Line: 44%"
     },
@@ -159,8 +159,8 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Yellow Line": 0.5564,
-        "Pink Line": 0.4436
+        "Yellow Line": 0.5582,
+        "Pink Line": 0.4418
       },
       "explanation": "Demand distributed across 2 lines: Yellow Line: 55%, Pink Line: 44%"
     },
@@ -170,10 +170,10 @@
         "Violet Line"
       ],
       "proportions": {
-        "Violet Line": 0.481,
-        "Pink Line": 0.519
+        "Pink Line": 0.519,
+        "Violet Line": 0.481
       },
-      "explanation": "Demand distributed across 2 lines: Violet Line: 48%, Pink Line: 51%"
+      "explanation": "Demand distributed across 2 lines: Pink Line: 51%, Violet Line: 48%"
     },
     "Janakpuri West": {
       "lines": [
@@ -181,8 +181,8 @@
         "Magenta Line"
       ],
       "proportions": {
-        "Blue Line": 0.6322,
-        "Magenta Line": 0.3678
+        "Blue Line": 0.6304,
+        "Magenta Line": 0.3696
       },
       "explanation": "Demand distributed across 2 lines: Blue Line: 63%, Magenta Line: 36%"
     },
@@ -192,10 +192,10 @@
         "Yellow Line"
       ],
       "proportions": {
-        "Magenta Line": 0.3822,
-        "Yellow Line": 0.6178
+        "Yellow Line": 0.6176,
+        "Magenta Line": 0.3824
       },
-      "explanation": "Demand distributed across 2 lines: Magenta Line: 38%, Yellow Line: 61%"
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 61%, Magenta Line: 38%"
     },
     "Kalkaji Mandir": {
       "lines": [
@@ -203,8 +203,8 @@
         "Violet Line"
       ],
       "proportions": {
-        "Violet Line": 0.5443,
-        "Magenta Line": 0.4557
+        "Violet Line": 0.5423,
+        "Magenta Line": 0.4577
       },
       "explanation": "Demand distributed across 2 lines: Violet Line: 54%, Magenta Line: 45%"
     },
@@ -214,8 +214,8 @@
         "Magenta Line"
       ],
       "proportions": {
-        "Blue Line": 0.6322,
-        "Magenta Line": 0.3678
+        "Blue Line": 0.6304,
+        "Magenta Line": 0.3696
       },
       "explanation": "Demand distributed across 2 lines: Blue Line: 63%, Magenta Line: 36%"
     },
@@ -225,10 +225,10 @@
         "Pink Line"
       ],
       "proportions": {
-        "Blue Line branch": 0.3904,
-        "Pink Line": 0.6096
+        "Pink Line": 0.6096,
+        "Blue Line branch": 0.3904
       },
-      "explanation": "Demand distributed across 2 lines: Blue Line branch: 39%, Pink Line: 60%"
+      "explanation": "Demand distributed across 2 lines: Pink Line: 60%, Blue Line branch: 39%"
     },
     "Karkarduma": {
       "lines": [
@@ -236,10 +236,10 @@
         "Pink Line"
       ],
       "proportions": {
-        "Blue Line branch": 0.3904,
-        "Pink Line": 0.6096
+        "Pink Line": 0.6096,
+        "Blue Line branch": 0.3904
       },
-      "explanation": "Demand distributed across 2 lines: Blue Line branch: 39%, Pink Line: 60%"
+      "explanation": "Demand distributed across 2 lines: Pink Line: 60%, Blue Line branch: 39%"
     },
     "Welcome": {
       "lines": [
@@ -263,16 +263,38 @@
       },
       "explanation": "Demand distributed across 2 lines: Blue Line: 57%, Pink Line: 42%"
     },
+    "Majlis Park": {
+      "lines": [
+        "Magenta Line",
+        "Pink Line"
+      ],
+      "proportions": {
+        "Pink Line": 0.5611,
+        "Magenta Line": 0.4389
+      },
+      "explanation": "Demand distributed across 2 lines: Pink Line: 56%, Magenta Line: 43%"
+    },
+    "Haiderpur Badli Mor": {
+      "lines": [
+        "Magenta Line",
+        "Yellow Line"
+      ],
+      "proportions": {
+        "Yellow Line": 0.6176,
+        "Magenta Line": 0.3824
+      },
+      "explanation": "Demand distributed across 2 lines: Yellow Line: 61%, Magenta Line: 38%"
+    },
     "Dwarka": {
       "lines": [
         "Blue Line",
         "Grey Line"
       ],
       "proportions": {
-        "Grey Line": 0.1511,
-        "Blue Line": 0.8489
+        "Blue Line": 0.8489,
+        "Grey Line": 0.1511
       },
-      "explanation": "Demand distributed across 2 lines: Grey Line: 15%, Blue Line: 84%"
+      "explanation": "Demand distributed across 2 lines: Blue Line: 84%, Grey Line: 15%"
     },
     "Punjabi Bagh West": {
       "lines": [

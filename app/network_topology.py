@@ -3,9 +3,8 @@ Real Delhi Metro network topology: station order along each line, and the
 interchange (transfer) stations between lines.
 
 Source: published DMRC route maps / line-by-line station orderings
-(cross-checked against Wikipedia's per-line articles). This intentionally
-matches the *stable* pre-2025 network, since that's what DELHI_METRO_DATA.csv
-covers (no 2025/2026-opened stations appear in it).
+(cross-checked against DMRC operational network information). The primary
+routes plus LINE_SEGMENTS include operational extensions through 2026.
 
 This is the piece that was completely missing from the original project:
 DELHI_METRO_DATA.csv only ever had (Station, Line, Latitude, Longitude) -- no
@@ -29,14 +28,15 @@ LINES = {
         "Rohini East", "Rohini West", "Rithala",
     ],
     "Yellow Line": [
-        "Samaypur Badli", "Rohini Sector 18", "Haiderpur", "Jahangirpuri",
+        "Samaypur Badli", "Rohini Sector 18", "Haiderpur Badli Mor", "Jahangirpuri",
         "Adarsh Nagar", "Azadpur", "Model Town", "GTB Nagar", "Vishwa Vidyalaya",
         "Vidhan Sabha", "Civil Lines", "Kashmere Gate", "Chandni Chowk",
-        "Chawri Bazar", "New Delhi", "Rajiv Chowk", "Central Secretariat",
+        "Chawri Bazar", "New Delhi", "Rajiv Chowk", "Patel Chowk",
+        "Central Secretariat",
         "Udyog Bhawan", "Lok Kalyan Marg", "Jor Bagh", "INA", "AIIMS",
         "Green Park", "Hauz Khas", "Malviya Nagar", "Saket", "Qutab Minar",
         "Chhatarpur", "Sultanpur", "Ghitorni", "Arjan Garh", "Guru Dronacharya",
-        "Sikandarpur", "MG Road", "IFFCO Chowk", "HUDA City Centre",
+        "Sikandarpur", "MG Road", "IFFCO Chowk", "Millennium City Centre Gurugram",
     ],
     "Blue Line": [
         "Dwarka Sector 21", "Dwarka Sector 8", "Dwarka Sector 9",
@@ -97,7 +97,7 @@ LINES = {
         "Shiv Vihar",
     ],
     "Magenta Line": [
-        "Janakpuri West", "Dabri Mor-Janakpuri South", "Dashrath Puri",
+        "Krishna Park Extension", "Janakpuri West", "Dabri Mor-Janakpuri South", "Dashrath Puri",
         "Palam", "Sadar Bazaar Cantonment", "Terminal 1-IGI Airport",
         "Shankar Vihar", "Vasant Vihar", "Munirka", "R.K.Puram",
         "Hauz Khas", "Panchsheel Park", "Chirag Delhi", "Greater Kailash",
@@ -109,11 +109,36 @@ LINES = {
     "Orange Line": [
         "New Delhi", "Shivaji Stadium", "Dhaula Kuan", "Delhi Aerocity",
         "Indira Gandhi International Airport", "Dwarka Sector 21",
+        "Yashobhoomi Dwarka Sector-25",
     ],
 }
 
+# Additional operational sections that share a corridor identity but are
+# not consecutive with the primary route list above. Keeping these as separate
+# ordered segments prevents accidentally connecting stations through unopened
+# Phase IV alignments.
+LINE_SEGMENTS = {
+    "Pink Line": [[
+        "Majlis Park", "Burari", "Jharoda Majra", "Jagatpur Village",
+        "Soorghat", "Sonia Vihar", "Khajuri Khas", "Bhajanpura",
+        "Yamuna Vihar", "Maujpur-Babarpur",
+    ]],
+    "Magenta Line": [[
+        "Majlis Park", "Bhalaswa", "Haiderpur Badli Mor", "Haiderpur Village",
+        "Uttari Pitampura-Prashant Vihar", "Madhuban Chowk", "Deepali Chowk",
+    ]],
+}
+
+
+def line_route_segments():
+    """Return every ordered operational route segment grouped by line."""
+    segments = {line: [stops] for line, stops in LINES.items()}
+    for line, additions in LINE_SEGMENTS.items():
+        segments.setdefault(line, []).extend(additions)
+    return segments
+
 # station name (as it appears above) -> set of line keys it interchanges between.
-# Only stations genuinely shared by 2+ of the LINES above are listed --
+# Only stations genuinely shared by 2+ operational routes are listed --
 # Sikandarpur/Rapid Metro Gurgaon and Noida Sector 52/Aqua Line are real DMRC
 # interchanges too, but those other networks aren't in this project's data.
 INTERCHANGES = {
@@ -140,6 +165,8 @@ INTERCHANGES = {
     "Karkarduma": {"Blue Line branch", "Pink Line"},
     "Welcome": {"Red Line", "Pink Line"},
     "Mayur Vihar -I": {"Blue Line", "Pink Line"},
+    "Majlis Park": {"Pink Line", "Magenta Line"},
+    "Haiderpur Badli Mor": {"Yellow Line", "Magenta Line"},
     "Dwarka": {"Blue Line", "Grey Line"},
     "Punjabi Bagh West": {"Green Line", "Pink Line"},
 }

@@ -18,7 +18,8 @@ import csv
 from collections import defaultdict
 
 from app.network_topology import (
-    LINES, INTERCHANGES, INTERCHANGE_PENALTY_MIN, DEFAULT_SEGMENT_MIN, ALIASES,
+    INTERCHANGES, INTERCHANGE_PENALTY_MIN,
+    DEFAULT_SEGMENT_MIN, ALIASES, line_route_segments,
 )
 
 AVG_SPEED_KMH = 32.0  # DMRC's published average commercial speed (incl. dwell)
@@ -70,8 +71,9 @@ def _haversine_km(lat1, lon1, lat2, lon2):
 def _match_topology_to_canonical(stations):
     mapping = {}
     all_topology_names = set()
-    for stops in LINES.values():
-        all_topology_names.update(stops)
+    for segments in line_route_segments().values():
+        for stops in segments:
+            all_topology_names.update(stops)
     all_topology_names.update(INTERCHANGES.keys())
 
     for name in all_topology_names:
@@ -97,30 +99,25 @@ def build_graph(csv_path):
 
     graph = defaultdict(dict)
 
-    for line, stops in LINES.items():
-        canon_stops = [mapping.get(s) for s in stops]
-        for a, b in zip(canon_stops, canon_stops[1:]):
-            if a is None or b is None:
-                continue
-            _, lat1, lon1 = stations[_normalize(a)]
-            _, lat2, lon2 = stations[_normalize(b)]
-            if not _is_placeholder_coord(lat1, lon1, coord_counts) and \
-               not _is_placeholder_coord(lat2, lon2, coord_counts):
-                weight = max((_haversine_km(lat1, lon1, lat2, lon2) / AVG_SPEED_KMH) * 60, 1.0)
-                if weight > MAX_SEGMENT_MIN:
-                    # Real adjacent DMRC stations are essentially never this
-                    # far apart (even the longest suburban stretches run
-                    # ~3-4 km). A haversine result this large means the
-                    # coordinate itself is wrong -- not a duplicate
-                    # placeholder (already caught above), just a bad,
-                    # unique-looking value -- e.g. "Hindon" in the source
-                    # data sits ~22 km north of its actual neighbours
-                    # Shaheed Sthal and Arthala. Fall back rather than trust it.
+    for line, segments in line_route_segments().items():
+        for stops in segments:
+            canon_stops = [mapping.get(s) for s in stops]
+            for a, b in zip(canon_stops, canon_stops[1:]):
+                if a is None or b is None:
+                    continue
+                _, lat1, lon1 = stations[_normalize(a)]
+                _, lat2, lon2 = stations[_normalize(b)]
+                if not _is_placeholder_coord(lat1, lon1, coord_counts) and \
+                   not _is_placeholder_coord(lat2, lon2, coord_counts):
+                    weight = max((_haversine_km(lat1, lon1, lat2, lon2) / AVG_SPEED_KMH) * 60, 1.0)
+                    if weight > MAX_SEGMENT_MIN:
+                        # Bad/placeholder coordinates should not create
+                        # implausible adjacent-station travel times.
+                        weight = DEFAULT_SEGMENT_MIN
+                else:
                     weight = DEFAULT_SEGMENT_MIN
-            else:
-                weight = DEFAULT_SEGMENT_MIN
-            graph[(a, line)][(b, line)] = weight
-            graph[(b, line)][(a, line)] = weight
+                graph[(a, line)][(b, line)] = weight
+                graph[(b, line)][(a, line)] = weight
 
     for station, lines_here in INTERCHANGES.items():
         canon = mapping.get(station)

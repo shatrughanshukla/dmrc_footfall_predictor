@@ -53,12 +53,12 @@ Greater Kailash,Magenta Line,28.5418777,77.2384553,False,Magenta Line,1
 Green Park,Yellow Line,28.5585815,77.2067183,False,Yellow Line,1
 GTB Nagar,Yellow Line,28.6981317,77.2064113,False,Yellow Line,1
 Guru Dronacharya,Yellow Line,28.4820212,77.1022685,False,Yellow Line,1
-Haiderpur,Yellow Line,28.7301214,77.14940289658404,False,Yellow Line,1
+Haiderpur Badli Mor,Yellow Line,28.7301214,77.14940289658404,True,"Magenta Line, Yellow Line",2
 Harkesh Nagar Okhla,Violet Line,28.5431246,77.2755616,False,Violet Line,1
 Hauz Khas,Yellow Line,28.5442564,77.2067072,True,"Magenta Line, Yellow Line",2
 Hazrat Nizamuddin,Pink Line,28.5887494,77.2572494,False,Pink Line,1
 Hindon,Red Line,28.878965,77.4154832,False,Red Line,1
-HUDA City Centre,Yellow Line,28.4593429,77.0726571,False,Yellow Line,1
+Millennium City Centre Gurugram,Yellow Line,28.4593429,77.0726571,False,Yellow Line,1
 IFFCO Chowk,Yellow Line,28.4723277,77.0724222,False,Yellow Line,1
 INA,Yellow Line,28.57440755,77.21024148189088,True,"Pink Line, Yellow Line",2
 Inderlok,Red Line,28.6517178,77.2219388,True,"Green Line, Red Line",2
@@ -101,7 +101,7 @@ Laxmi Nagar,Blue Line branch,28.63055515,77.2776331681994,False,Blue Line branch
 Lok Kalyan Marg,Yellow Line,28.598385,77.2029964,False,Yellow Line,1
 Madipur,Green Line,28.6764752,77.1193599,False,Green Line,1
 Maharaja Surajmal Stadium,Green Line,28.6793,77.0673,False,Green Line,1
-Majlis Park,Pink Line,28.7244312,77.181964,False,Pink Line,1
+Majlis Park,Pink Line,28.7244312,77.181964,True,"Magenta Line, Pink Line",2
 Major Mohit Sharma,Red Line,28.6776112,77.3581426,False,Red Line,1
 Malviya Nagar,Yellow Line,28.5339201,77.2124474,False,Yellow Line,1
 Mandawali – West Vinod Nagar,Pink Line,28.6249712,77.3044906,False,Pink Line,1
@@ -227,3 +227,18 @@ Vinobapuri,Pink Line,28.5669763,77.2491906,False,Pink Line,1
 Vishwa Vidyalaya,Yellow Line,28.6950369,77.2147192,False,Yellow Line,1
 Welcome,Red Line,28.6517178,77.2219388,True,"Pink Line, Red Line",2
 Yamuna Bank,Blue Line,28.6232784,77.26792404925054,True,"Blue Line, Blue Line branch",2
+Krishna Park Extension,Magenta Line,,,False,Magenta Line,1
+Yashobhoomi Dwarka Sector-25,Orange Line,,,False,Orange Line,1
+Yamuna Vihar,Pink Line,,,False,Pink Line,1
+Bhajanpura,Pink Line,,,False,Pink Line,1
+Khajuri Khas,Pink Line,,,False,Pink Line,1
+Sonia Vihar,Pink Line,,,False,Pink Line,1
+Soorghat,Pink Line,,,False,Pink Line,1
+Jagatpur Village,Pink Line,,,False,Pink Line,1
+Jharoda Majra,Pink Line,,,False,Pink Line,1
+Burari,Pink Line,,,False,Pink Line,1
+Bhalaswa,Magenta Line,,,False,Magenta Line,1
+Haiderpur Village,Magenta Line,,,False,Magenta Line,1
+Uttari Pitampura-Prashant Vihar,Magenta Line,,,False,Magenta Line,1
+Madhuban Chowk,Magenta Line,,,False,Magenta Line,1
+Deepali Chowk,Magenta Line,,,False,Magenta Line,1
