@@ -69,26 +69,26 @@
 
             <div class="kpi-card" style="border-left-color: #10b981;">
                 <div class="kpi-title">Recommended Headway</div>
-                <div class="kpi-value">{{ interval }}m</div>
-                <div class="kpi-subtext">Baseline: {{ existing_interval }}m</div>
+                <div class="kpi-value">{{ (interval|string ~ 'm') if service_open else 'Closed' }}</div>
+                <div class="kpi-subtext">{{ ('Baseline: ' ~ existing_interval|string ~ 'm') if service_open else 'No service at selected time' }}</div>
             </div>
 
             <div class="kpi-card" style="border-left-color: #8b5cf6;">
                 <div class="kpi-title">Recommended Service</div>
-                <div class="kpi-value">{{ num_trains_needed }}</div>
-                <div class="kpi-subtext">Baseline: {{ existing_trains }} trains/hr</div>
+                <div class="kpi-value">{{ num_trains_needed if service_open else 0 }}</div>
+                <div class="kpi-subtext">{{ ('Baseline: ' ~ existing_trains|string ~ ' trains/hr') if service_open else 'No trains operating' }}</div>
             </div>
 
             <div class="kpi-card" style="border-left-color: #f59e0b;">
                 <div class="kpi-title">Capacity Utilization</div>
-                <div class="kpi-value">{{ capacity_utilization }}%</div>
-                <div class="kpi-subtext">Comfort Clearance Budget</div>
+                <div class="kpi-value">{{ (capacity_utilization|string ~ '%') if service_open else 'N/A' }}</div>
+                <div class="kpi-subtext">{{ 'Comfort Clearance Budget' if service_open else 'Metro closed' }}</div>
             </div>
 
             <div class="kpi-card" style="border-left-color: #ef4444;">
                 <div class="kpi-title">Avg Passenger Wait</div>
-                <div class="kpi-value">{{ avg_wait_time }} min</div>
-                <div class="kpi-subtext">Random Arrival Standard</div>
+                <div class="kpi-value">{{ (avg_wait_time|string ~ ' min') if service_open else 'N/A' }}</div>
+                <div class="kpi-subtext">{{ 'Random Arrival Standard' if service_open else 'No passenger service' }}</div>
             </div>
         </div>
 
@@ -98,7 +98,9 @@
                 <span>{% if schedule_res.is_interchange %}Interchange Line Demand Distribution{% else %}Corridor Demand & Service Allocation{% endif %}</span>
             </div>
             <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
-                {% if schedule_res.is_interchange %}
+                {% if not service_open %}
+                    Metro service is closed at the selected time; modeled demand and train service are zero.
+                {% elif schedule_res.is_interchange %}
                     Demand distributed across intersecting lines based on corridor capacity and network centrality weighting.
                 {% else %}
                     Full passenger demand allocated to this single-line corridor.
@@ -125,15 +127,15 @@
                             <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background-color:{{ color }}; vertical-align:middle; margin-right:8px;"></span>
                             <strong style="color: {{ '#b45309' if color == '#eab308' else color }};">{{ l.line }}</strong>
                         </td>
-                        <td><strong>{{ l.demand_share_pct }}%</strong></td>
+                        <td><strong>{{ (l.demand_share_pct|string ~ '%') if service_open else '—' }}</strong></td>
                         <td><strong>{{ l.line_demand | int }}</strong> riders/hr</td>
-                        <td>{{ l.existing_headway_min }} min</td>
-                        <td><strong style="color: #0284c7;">{{ l.recommended_headway_min }} min</strong></td>
-                        <td>{{ l.recommended_trains_per_hour }} tph</td>
+                        <td>{{ (l.existing_headway_min|string ~ ' min') if service_open else 'Closed' }}</td>
+                        <td><strong style="color: #0284c7;">{{ (l.recommended_headway_min|string ~ ' min') if service_open else 'Closed' }}</strong></td>
+                        <td>{{ l.recommended_trains_per_hour if service_open else 0 }} tph</td>
                         <td>
-                            <span class="badge" style="background: {{ l.crowding_color }}; color: white;">{{ l.capacity_utilization_pct }}%</span>
+                            <span class="badge" style="background: {{ l.crowding_color }}; color: white;">{{ (l.capacity_utilization_pct|string ~ '%') if service_open else '—' }}</span>
                         </td>
-                        <td>{{ l.status_action }}</td>
+                        <td>{{ 'Metro closed' if not service_open else l.status_action }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

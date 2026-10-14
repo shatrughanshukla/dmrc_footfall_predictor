@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from app.calendar_context import get_calendar_context
+from app.operating_hours import is_service_operating
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'footfall_forecaster.joblib')
@@ -56,6 +57,8 @@ def predict_hourly_footfall(station: str, dt_obj: datetime, hour: int) -> int:
     """
     Predicts footfall for a given station, date, and hour using the trained ML model.
     """
+    if hour < 5 or hour > 23:
+        return 0
     info = get_station_info(station)
     st_idx = _META['station2idx'].get(station, 0)
     line_idx = _META['line2idx'].get(info['line'], 0)
@@ -117,6 +120,8 @@ def predict_footfall_with_minute_interpolation(station: str, dt_obj: datetime, h
     """
     Interpolates smoothly across the hour based on the minute.
     """
+    if not is_service_operating(hour, minute):
+        return 0
     v0 = predict_hourly_footfall(station, dt_obj, hour)
     next_hour = min(23, hour + 1)
     v1 = predict_hourly_footfall(station, dt_obj, next_hour)

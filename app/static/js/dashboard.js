@@ -204,6 +204,7 @@ function renderDashboard(data) {
     if (!data || !data.scheduling) return;
     const { station, datetime, footfall, scheduling, profile_24h, station_info } = data;
     const hl = scheduling.headline;
+    const serviceClosed = datetime.service_open === false;
     const selectedLine = document.getElementById('lineSelect')?.value || '';
     const lineDemand = Number.isFinite(Number(hl.line_demand)) ? Number(hl.line_demand) : footfall.hourly_demand;
     const originEl = document.getElementById('travelOriginName');
@@ -221,7 +222,9 @@ function renderDashboard(data) {
         const calendar = data.calendar_context;
         const occasion = calendar.occasion || 'No major occasion in the loaded calendar';
         const source = calendar.calendar_source ? ` Calendar: ${calendar.calendar_source}.` : '';
-        calendarEl.textContent = `${calendar.weekday}, ${datetime.date} · ${calendar.day_status} · ${occasion}. ${datetime.time}: ${calendar.hour_band}, relative to this station’s forecast curve; daily peak ${calendar.daily_peak_hour}.${source}`;
+        calendarEl.textContent = serviceClosed
+            ? `${calendar.weekday}, ${datetime.date} · ${calendar.day_status} · ${occasion}. ${datetime.time}: Metro closed; no trains or passenger demand are modeled. Daily operating-hours peak ${calendar.daily_peak_hour}.${source}`
+            : `${calendar.weekday}, ${datetime.date} · ${calendar.day_status} · ${occasion}. ${datetime.time}: ${calendar.hour_band}, relative to this station’s forecast curve; daily peak ${calendar.daily_peak_hour}.${source}`;
     }
 
     try {
@@ -240,34 +243,34 @@ function renderDashboard(data) {
         if (ffEl) ffEl.textContent = lineDemand.toLocaleString();
         const instFfEl = document.getElementById('dispInstantFootfall');
         const currentShare = footfall.hourly_demand ? lineDemand / footfall.hourly_demand : 1;
-        if (instFfEl) instFfEl.textContent = `${selectedLine ? `${selectedLine} · ` : (hl.is_station_summary ? 'All lines · ' : '')}Interpolated estimate: ${Math.round(footfall.instant_interpolated * currentShare).toLocaleString()}`;
+        if (instFfEl) instFfEl.textContent = serviceClosed ? 'Metro closed; no passenger service' : `${selectedLine ? `${selectedLine} · ` : (hl.is_station_summary ? 'All lines · ' : '')}Interpolated estimate: ${Math.round(footfall.instant_interpolated * currentShare).toLocaleString()}`;
         
         // KPI 2: Recommended Headway
         const recHwEl = document.getElementById('dispRecHeadway');
-        if (recHwEl) recHwEl.textContent = hl.is_station_summary ? 'Varies' : `${hl.recommended_headway_min}m`;
+        if (recHwEl) recHwEl.textContent = serviceClosed ? 'Closed' : (hl.is_station_summary ? 'Varies' : `${hl.recommended_headway_min}m`);
         const existHwEl = document.getElementById('dispExistingHeadway');
-        if (existHwEl) existHwEl.textContent = hl.is_station_summary ? `See ${hl.line_count} line recommendations below` : `Baseline: ${hl.existing_headway_min}m (${hl.is_peak ? 'Peak' : 'Off-Peak'})`;
+        if (existHwEl) existHwEl.textContent = serviceClosed ? 'No service at selected time' : (hl.is_station_summary ? `See ${hl.line_count} line recommendations below` : `Baseline: ${hl.existing_headway_min}m (${hl.is_peak ? 'Peak' : 'Off-Peak'})`);
 
         // KPI 3: Trains Per Hour
         const recTrEl = document.getElementById('dispRecTrains');
-        if (recTrEl) recTrEl.textContent = `${hl.recommended_trains_per_hour}`;
+        if (recTrEl) recTrEl.textContent = serviceClosed ? '0' : `${hl.recommended_trains_per_hour}`;
         const existTrEl = document.getElementById('dispExistingTrains');
-        if (existTrEl) existTrEl.textContent = hl.is_station_summary ? `Combined across ${hl.line_count} lines · trains/hour` : `Baseline: ${hl.existing_trains_per_hour} trains/hr`;
+        if (existTrEl) existTrEl.textContent = serviceClosed ? 'No trains operating' : (hl.is_station_summary ? `Combined across ${hl.line_count} lines · trains/hour` : `Baseline: ${hl.existing_trains_per_hour} trains/hr`);
 
         // KPI 4: Capacity Utilization & Crowding Risk
         const utilEl = document.getElementById('dispUtilization');
-        if (utilEl) utilEl.textContent = `${hl.capacity_utilization_pct}%`;
+        if (utilEl) utilEl.textContent = serviceClosed ? 'N/A' : `${hl.capacity_utilization_pct}%`;
         const utilContextEl = document.getElementById('dispUtilizationContext');
         if (utilContextEl) {
             const scope = hl.is_station_summary ? 'All lines' : (selectedLine || hl.line);
             const capacity = Number(hl.recommended_clearance_capacity || 0).toLocaleString();
-            utilContextEl.textContent = `${scope} · estimated boarding capacity ${capacity}/hr`;
+            utilContextEl.textContent = serviceClosed ? 'Metro closed' : `${scope} · estimated boarding capacity ${capacity}/hr`;
         }
         // KPI 5: Average Wait Time
         const waitEl = document.getElementById('dispWaitTime');
-        if (waitEl) waitEl.textContent = `${hl.avg_wait_time_rec_min} min`;
+        if (waitEl) waitEl.textContent = serviceClosed ? 'N/A' : `${hl.avg_wait_time_rec_min} min`;
         const fleetEl = document.getElementById('dispFleetDeployed');
-        if (fleetEl) fleetEl.textContent = `Active Fleet: ${hl.trains_deployed_rec}/${hl.fleet_size_available} trains`;
+        if (fleetEl) fleetEl.textContent = serviceClosed ? 'No trains operating' : `Active Fleet: ${hl.trains_deployed_rec}/${hl.fleet_size_available} trains`;
 
         // Operational Explanation Box
         const expEl = document.getElementById('dispExplanationText');
@@ -434,15 +437,16 @@ function renderInterchangeBreakdown(scheduling) {
         sliceColors.push(lineColor);
 
         const tr = document.createElement('tr');
+        const serviceClosed = l.status_action === 'SERVICE_CLOSED';
         tr.innerHTML = `
             <td>
                 <span class="line-chip" style="--metro-line-color: ${lineColor}"><i class="line-marker" aria-hidden="true"></i><span>${l.line}</span></span>
             </td>
-            <td><strong>${l.demand_share_pct}%</strong></td>
+            <td><strong>${serviceClosed ? '—' : `${l.demand_share_pct}%`}</strong></td>
             <td><strong>${l.line_demand.toLocaleString()}</strong> riders/hr</td>
-            <td>${l.existing_headway_min}m</td>
-            <td><strong style="color: #0284c7;">${l.recommended_headway_min}m</strong> (${l.recommended_trains_per_hour} tph)</td>
-            <td><span class="badge" style="background: ${l.crowding_color}; color: white;">${l.capacity_utilization_pct}%</span></td>
+            <td>${serviceClosed ? 'Closed' : `${l.existing_headway_min}m`}</td>
+            <td><strong style="color: #0284c7;">${serviceClosed ? 'Closed' : `${l.recommended_headway_min}m (${l.recommended_trains_per_hour} tph)`}</strong></td>
+            <td><span class="badge" style="background: ${l.crowding_color}; color: white;">${serviceClosed ? '—' : `${l.capacity_utilization_pct}%`}</span></td>
         `;
         tableBody.appendChild(tr);
     });

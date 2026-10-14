@@ -251,7 +251,7 @@ def optimize_line_schedule(line: str, station_name: str, hour: int, day_of_week:
 
 def optimize_station_schedule(station: str, primary_line: str, all_lines: list,
                               hour: int, day_of_week: int, total_footfall: int,
-                              is_workday=None) -> dict:
+                              is_workday=None, service_open=True) -> dict:
     """
     Evaluates demand and scheduling for the entire station, including line-wise breakdowns
     for interchange stations.
@@ -264,8 +264,30 @@ def optimize_station_schedule(station: str, primary_line: str, all_lines: list,
         share = line_splits.get(line, 1.0 / len(all_lines))
         line_demand = round(total_footfall * share)
         line_rec = optimize_line_schedule(
-            line, station, hour, day_of_week, line_demand, is_workday=is_workday
+            line, station, hour, day_of_week, line_demand if service_open else 0, is_workday=is_workday
         )
+        if not service_open:
+            line_rec.update({
+                'line_demand': 0,
+                'existing_headway_min': None,
+                'existing_trains_per_hour': 0,
+                'existing_clearance_capacity': 0,
+                'existing_line_capacity': 0,
+                'recommended_headway_min': None,
+                'recommended_trains_per_hour': 0,
+                'recommended_clearance_capacity': 0,
+                'recommended_total_line_capacity': 0,
+                'capacity_shortfall_surplus': 0,
+                'capacity_utilization_pct': 0,
+                'avg_wait_time_existing_min': 0,
+                'avg_wait_time_rec_min': 0,
+                'trains_deployed_rec': 0,
+                'crowding_risk': 'SERVICE_CLOSED',
+                'crowding_badge': 'Metro closed',
+                'crowding_color': '#64748b',
+                'status_action': 'SERVICE_CLOSED',
+                'explanation': 'Metro service is closed at the selected time. No trains are operating and modeled passenger demand is zero.'
+            })
         line_rec["demand_share_pct"] = round(share * 100.0, 1)
         line_recommendations.append(line_rec)
         
@@ -275,7 +297,7 @@ def optimize_station_schedule(station: str, primary_line: str, all_lines: list,
     return {
         "station": station,
         "is_interchange": is_interchange,
-        "total_station_footfall": total_footfall,
+        "total_station_footfall": total_footfall if service_open else 0,
         "all_lines": all_lines,
         "primary_line": primary_rec["line"],
         "line_distribution_metadata": _LINE_DIST_MODEL.get("metadata", {}),

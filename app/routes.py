@@ -26,6 +26,7 @@ from app.forecasting import (
 )
 from app.scheduling_optimizer import optimize_station_schedule
 from app.calendar_context import get_calendar_context
+from app.operating_hours import is_service_operating
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIONS_CLEANED_PATH = os.path.join(BASE_DIR, 'data', 'cleaned', 'stations_cleaned.csv')
@@ -62,11 +63,8 @@ def _parse_datetime(date_str, time_str):
         hour, minute = 9, 0
     else:
         try:
-            parts = [int(p) for p in time_str.split(':')]
-            if not parts:
-                raise ValueError
-            hour = max(5, min(23, parts[0]))
-            minute = max(0, min(59, parts[1])) if len(parts) > 1 else 0
+            parsed_time = datetime.strptime(time_str, "%H:%M").time()
+            hour, minute = parsed_time.hour, parsed_time.minute
         except ValueError:
             raise ValueError("Choose a valid time in HH:MM format.")
 
@@ -74,8 +72,10 @@ def _parse_datetime(date_str, time_str):
     return dt_obj, hour, minute
 
 
-def _hour_band(profile, hour):
+def _hour_band(profile, hour, minute=0):
     """Classify an hour relative to this station/date's predicted profile."""
+    if not is_service_operating(hour, minute):
+        return "Metro closed"
     values = sorted(profile)
     if not values:
         return "Unavailable"
@@ -153,13 +153,15 @@ def get_footfall():
         return str(exc), 400
     day_name = dt_obj.strftime('%A')
     formatted_time = f"{hour:02d}:{minute:02d}"
+    service_open = is_service_operating(hour, minute)
     calendar_context = get_calendar_context(dt_obj.date())
+    calendar_context['service_open'] = service_open
 
     st_info = get_station_info(station)
 
     # 1. Machine learning footfall forecast
-    time_footfall = predict_footfall_with_minute_interpolation(station, dt_obj, hour, minute)
-    hourly_footfall = predict_hourly_footfall(station, dt_obj, hour)
+    time_footfall = predict_footfall_with_minute_interpolation(station, dt_obj, hour, minute) if service_open else 0
+    hourly_footfall = predict_hourly_footfall(station, dt_obj, hour) if service_open else 0
     profile_24h = predict_station_full_day_profile(station, dt_obj)
     total_footfall = profile_24h['daily_total']
 
@@ -171,7 +173,8 @@ def get_footfall():
         hour=hour,
         day_of_week=dt_obj.weekday(),
         total_footfall=hourly_footfall,
-        is_workday=calendar_context['is_workday']
+        is_workday=calendar_context['is_workday'],
+        service_open=service_open
     )
 
     # If user selected a specific line, prioritize its recommendation for the headline cards
@@ -203,7 +206,7 @@ def get_footfall():
         station_info=st_info,
         day=day_name,
         calendar_context=calendar_context,
-        selected_hour_band=_hour_band(profile_24h['predicted'], hour),
+        selected_hour_band=_hour_band(profile_24h['predicted'], hour, minute),
         date=dt_obj.strftime('%Y-%m-%d'),
         time=formatted_time,
         total_footfall=total_footfall,
@@ -217,6 +220,7 @@ def get_footfall():
         crowding_badge=primary_rec['crowding_badge'],
         crowding_color=primary_rec['crowding_color'],
         avg_wait_time=primary_rec['avg_wait_time_rec_min'],
+        service_open=service_open,
         explanation=primary_rec['explanation'],
         schedule_res=schedule_res,
         profile_24h=profile_24h,
@@ -243,11 +247,13 @@ def api_predict():
     except ValueError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 400
     calendar_context = get_calendar_context(dt_obj.date())
+    service_open = is_service_operating(hour, minute)
+    calendar_context['service_open'] = service_open
     st_info = get_station_info(station)
 
     # 1. Predictions
-    time_footfall = predict_footfall_with_minute_interpolation(station, dt_obj, hour, minute)
-    hourly_footfall = predict_hourly_footfall(station, dt_obj, hour)
+    time_footfall = predict_footfall_with_minute_interpolation(station, dt_obj, hour, minute) if service_open else 0
+    hourly_footfall = predict_hourly_footfall(station, dt_obj, hour) if service_open else 0
     profile_24h = predict_station_full_day_profile(station, dt_obj)
 
     # 2. Scheduling Optimization
@@ -258,7 +264,8 @@ def api_predict():
         hour=hour,
         day_of_week=dt_obj.weekday(),
         total_footfall=hourly_footfall,
-        is_workday=calendar_context['is_workday']
+        is_workday=calendar_context['is_workday'],
+        service_open=service_open
     )
 
     # Filter if requested
@@ -316,6 +323,27 @@ def api_predict():
             )
         }
 
+    if not service_open:
+        filtered_rec = {
+            **filtered_rec,
+            'line': 'All lines' if station_summary else filtered_rec['line'],
+            'line_demand': 0,
+            'recommended_headway_min': None,
+            'existing_headway_min': None,
+            'recommended_trains_per_hour': 0,
+            'existing_trains_per_hour': 0,
+            'recommended_clearance_capacity': 0,
+            'existing_clearance_capacity': 0,
+            'capacity_utilization_pct': None,
+            'crowding_risk': 'SERVICE_CLOSED',
+            'crowding_badge': 'Metro closed',
+            'crowding_color': '#64748b',
+            'avg_wait_time_rec_min': None,
+            'trains_deployed_rec': 0,
+            'status_action': 'SERVICE_CLOSED',
+            'explanation': f"Metro service is closed at {hour:02d}:{minute:02d} (modeled operating window: 05:00-23:30). No trains are operating and modeled passenger demand is zero."
+        }
+
     # 3. Dijkstra Travel Times to ALL stations
     times = shortest_times_from(travel_graph, station)
     station_line_map = dict(zip(stations_df['Station'], stations_df['Line']))
@@ -328,7 +356,7 @@ def api_predict():
         for dest, mins in sorted(times.items(), key=lambda kv: kv[1])
     ]
 
-    calendar_context['hour_band'] = _hour_band(profile_24h['predicted'], hour)
+    calendar_context['hour_band'] = _hour_band(profile_24h['predicted'], hour, minute)
     calendar_context['selected_hour_demand'] = hourly_footfall
     calendar_context['daily_peak_hour'] = profile_24h['peak_hour']
 
@@ -342,7 +370,8 @@ def api_predict():
             "time": f"{hour:02d}:{minute:02d}",
             "hour": hour,
             "minute": minute,
-            "is_peak": filtered_rec['is_peak']
+            "is_peak": filtered_rec['is_peak'],
+            "service_open": service_open
         },
         "calendar_context": calendar_context,
         "footfall": {
