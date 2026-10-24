@@ -1,21 +1,14 @@
-"""
-DMRC Passenger Footfall Prediction & Train Scheduling Optimization Web Application.
-
-Routes:
-- /                   : Interactive transit management dashboard
-- /get_footfall       : Synchronous result view (backward-compatible)
-- /api/predict        : JSON endpoint for real-time forecasting & scheduling optimization
-- /api/stations       : Station directory with line and interchange metadata
-- /api/model_metrics  : Model validation metrics vs historical baselines
-"""
+"""FastAPI routes for the MetroInsights dashboard and planning API."""
 import os
-import json
-from datetime import datetime, date
+from datetime import datetime
 from zoneinfo import ZoneInfo
-from flask import render_template, request, jsonify
+from fastapi import Request
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.templating import Jinja2Templates
+from starlette.concurrency import run_in_threadpool
 import pandas as pd
 
-from app import app
+from app import app, BASE_DIR
 from app.travel_graph import build_graph, shortest_times_from
 from app.forecasting import (
     get_station_info,
@@ -28,7 +21,8 @@ from app.scheduling_optimizer import optimize_station_schedule
 from app.calendar_context import get_calendar_context
 from app.operating_hours import is_service_operating
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = str(BASE_DIR)
+TEMPLATES = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), 'templates'))
 STATIONS_CLEANED_PATH = os.path.join(BASE_DIR, 'data', 'cleaned', 'stations_cleaned.csv')
 if not os.path.exists(STATIONS_CLEANED_PATH):
     STATIONS_CLEANED_PATH = os.path.join(BASE_DIR, 'csvFiles', 'DELHI_METRO_DATA.csv')
@@ -81,7 +75,10 @@ def _hour_band(profile, hour, minute=0):
         return "Unavailable"
     low = values[int((len(values) - 1) * 0.25)]
     high = values[int((len(values) - 1) * 0.75)]
-    value = profile[hour - 5]
+    idx = hour - 5
+    if not (0 <= idx < len(profile)):
+        return "Typical demand"
+    value = profile[idx]
     if value >= high:
         return "Peak demand"
     if value <= low:
@@ -89,8 +86,8 @@ def _hour_band(profile, hour, minute=0):
     return "Typical demand"
 
 
-@app.route('/')
-def landing():
+@app.get('/', response_class=HTMLResponse)
+def landing(request: Request):
     """Product landing page with a live, clearly labeled scenario preview."""
     today = datetime.now(ZoneInfo('Asia/Kolkata')).date()
     hero_station = 'Rajiv Chowk'
@@ -98,18 +95,21 @@ def landing():
         hero_station,
         datetime(today.year, today.month, today.day, 9, 0)
     )
-    return render_template(
-        'landing.html',
-        default_date=today.isoformat(),
-        default_date_label=today.strftime('%A, %d %B %Y'),
-        hero_station=hero_station,
-        hero_profile=hero_profile,
-        eval_metrics=get_model_evaluation_summary(),
+    return TEMPLATES.TemplateResponse(
+        request=request,
+        name='landing.html',
+        context={
+            'default_date': today.isoformat(),
+            'default_date_label': today.strftime('%A, %d %B %Y'),
+            'hero_station': hero_station,
+            'hero_profile': hero_profile,
+            'eval_metrics': get_model_evaluation_summary(),
+        },
     )
 
 
-@app.route('/dashboard')
-def index():
+@app.get('/dashboard', response_class=HTMLResponse)
+def index(request: Request):
     # Build stations metadata dict for client-side search and line filtering
     stations_meta = {}
     for _, row in stations_df.iterrows():
@@ -125,32 +125,39 @@ def index():
 
     eval_metrics = get_model_evaluation_summary()
 
-    return render_template(
-        'index.html',
-        stations=ALL_STATIONS,
-        stations_meta=stations_meta,
-        busiest_station=BUSIEST_STATION,
-        peak_hour=PEAK_HOUR,
-        eval_metrics=eval_metrics,
-        default_date=datetime.now(ZoneInfo('Asia/Kolkata')).date().isoformat(),
-        today_date=datetime.now(ZoneInfo('Asia/Kolkata')).date().isoformat(),
-        default_time="09:00",
-        default_station="Rajiv Chowk"
+    return TEMPLATES.TemplateResponse(
+        request=request,
+        name='index.html',
+        context={
+            'stations_meta': stations_meta,
+            'eval_metrics': eval_metrics,
+            'stations': ALL_STATIONS,
+            'busiest_station': BUSIEST_STATION,
+            'peak_hour': PEAK_HOUR,
+            'default_date': datetime.now(ZoneInfo('Asia/Kolkata')).date().isoformat(),
+            'today_date': datetime.now(ZoneInfo('Asia/Kolkata')).date().isoformat(),
+            'default_time': '09:00',
+            'default_station': 'Rajiv Chowk',
+        },
     )
 
 
-@app.route('/get_footfall', methods=['POST'])
-def get_footfall():
-    station = request.form.get('station', 'Rajiv Chowk').strip().rstrip('†‡*#¤').strip()
-    day_str = request.form.get('day', 'Monday')
-    time_str = request.form.get('time', '09:00')
-    date_str = request.form.get('date', '')
-    selected_line = request.form.get('line', '')
+@app.post('/get_footfall', response_class=HTMLResponse)
+async def get_footfall(request: Request):
+    form = await request.form()
+    station = form.get('station', 'Rajiv Chowk').strip().rstrip('†‡*#¤').strip()
+    time_str = form.get('time', '09:00')
+    date_str = form.get('date', '')
+    selected_line = form.get('line', '')
 
+    return await run_in_threadpool(_render_footfall_result, request, station, time_str, date_str, selected_line)
+
+
+def _render_footfall_result(request, station, time_str, date_str, selected_line):
     try:
         dt_obj, hour, minute = _parse_datetime(date_str, time_str)
     except ValueError as exc:
-        return str(exc), 400
+        return PlainTextResponse(str(exc), status_code=400)
     day_name = dt_obj.strftime('%A')
     formatted_time = f"{hour:02d}:{minute:02d}"
     service_open = is_service_operating(hour, minute)
@@ -200,52 +207,67 @@ def get_footfall():
     except Exception:
         travel_info = []
 
-    return render_template(
-        'result.html',
-        station=station,
-        station_info=st_info,
-        day=day_name,
-        calendar_context=calendar_context,
-        selected_hour_band=_hour_band(profile_24h['predicted'], hour, minute),
-        date=dt_obj.strftime('%Y-%m-%d'),
-        time=formatted_time,
-        total_footfall=total_footfall,
-        time_footfall=time_footfall,
-        hourly_footfall=hourly_footfall,
-        num_trains_needed=round(primary_rec['recommended_trains_per_hour'], 1),
-        interval=primary_rec['recommended_headway_min'],
-        existing_interval=primary_rec['existing_headway_min'],
-        existing_trains=round(primary_rec['existing_trains_per_hour'], 1),
-        capacity_utilization=primary_rec['capacity_utilization_pct'],
-        crowding_badge=primary_rec['crowding_badge'],
-        crowding_color=primary_rec['crowding_color'],
-        avg_wait_time=primary_rec['avg_wait_time_rec_min'],
-        service_open=service_open,
-        explanation=primary_rec['explanation'],
-        schedule_res=schedule_res,
-        profile_24h=profile_24h,
-        busiest_station=BUSIEST_STATION,
-        peak_hour=PEAK_HOUR,
-        travel_info=travel_info,
-        eval_metrics=get_model_evaluation_summary()
+    return TEMPLATES.TemplateResponse(
+        request=request,
+        name='result.html',
+        context={
+            'station': station,
+            'calendar_context': calendar_context,
+            'total_footfall': total_footfall,
+            'time_footfall': time_footfall,
+            'hourly_footfall': hourly_footfall,
+            'service_open': service_open,
+            'schedule_res': schedule_res,
+            'profile_24h': profile_24h,
+            'travel_info': travel_info,
+            'station_info': st_info,
+            'day': day_name,
+            'selected_hour_band': _hour_band(profile_24h['predicted'], hour, minute),
+            'date': dt_obj.strftime('%Y-%m-%d'),
+            'time': formatted_time,
+            'num_trains_needed': round(primary_rec['recommended_trains_per_hour'], 1),
+            'interval': primary_rec['recommended_headway_min'],
+            'existing_interval': primary_rec['existing_headway_min'],
+            'existing_trains': round(primary_rec['existing_trains_per_hour'], 1),
+            'capacity_utilization': primary_rec['capacity_utilization_pct'],
+            'crowding_badge': primary_rec['crowding_badge'],
+            'crowding_color': primary_rec['crowding_color'],
+            'avg_wait_time': primary_rec['avg_wait_time_rec_min'],
+            'explanation': primary_rec['explanation'],
+            'busiest_station': BUSIEST_STATION,
+            'peak_hour': PEAK_HOUR,
+            'eval_metrics': get_model_evaluation_summary(),
+        },
     )
 
 
-@app.route('/api/predict', methods=['GET', 'POST'])
-def api_predict():
+@app.api_route('/api/predict', methods=['GET', 'POST'])
+async def api_predict(request: Request):
     """
     JSON API for dynamic frontend interaction without full page reloads.
     """
-    data = request.get_json(silent=True) or request.args
-    station = data.get('station', 'Rajiv Chowk').strip().rstrip('†‡*#¤').strip()
-    date_str = data.get('date', '')
-    time_str = data.get('time', '09:00')
-    line_filter = data.get('line', '')
+    if request.method == 'POST' and 'application/json' in request.headers.get('content-type', ''):
+        try:
+            data = await request.json()
+        except ValueError:
+            return JSONResponse({"status": "error", "message": "Request body must contain valid JSON."}, status_code=400)
+        if not isinstance(data, dict):
+            return JSONResponse({"status": "error", "message": "JSON request body must be an object."}, status_code=400)
+    else:
+        data = request.query_params
+    return await run_in_threadpool(_predict_data, data)
+
+
+def _predict_data(data):
+    station = str(data.get('station') or 'Rajiv Chowk').strip().rstrip('†‡*#¤').strip()
+    date_str = str(data.get('date') or '')
+    time_str = str(data.get('time') or '09:00')
+    line_filter = str(data.get('line') or '')
 
     try:
         dt_obj, hour, minute = _parse_datetime(date_str, time_str)
     except ValueError as exc:
-        return jsonify({"status": "error", "message": str(exc)}), 400
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=400)
     calendar_context = get_calendar_context(dt_obj.date())
     service_open = is_service_operating(hour, minute)
     calendar_context['service_open'] = service_open
@@ -360,7 +382,7 @@ def api_predict():
     calendar_context['selected_hour_demand'] = hourly_footfall
     calendar_context['daily_peak_hour'] = profile_24h['peak_hour']
 
-    return jsonify({
+    return JSONResponse({
         "status": "success",
         "station": station,
         "station_info": st_info,
@@ -398,7 +420,7 @@ def api_predict():
     })
 
 
-@app.route('/api/stations')
+@app.get('/api/stations')
 def api_stations():
     stations_data = []
     for _, row in stations_df.iterrows():
@@ -412,9 +434,9 @@ def api_stations():
             "latitude": float(row['Latitude']) if pd.notna(row['Latitude']) else None,
             "longitude": float(row['Longitude']) if pd.notna(row['Longitude']) else None,
         })
-    return jsonify({"stations": stations_data})
+    return JSONResponse({"stations": stations_data})
 
 
-@app.route('/api/model_metrics')
+@app.get('/api/model_metrics')
 def api_model_metrics():
-    return jsonify(get_model_evaluation_summary())
+    return JSONResponse(get_model_evaluation_summary())

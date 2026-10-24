@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MetroInsights - Delhi Metro Forecasting</title>
     <script>try{document.documentElement.dataset.theme=localStorage.getItem('metroflow-theme')||'light'}catch(e){}</script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/metro-theme.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-polish.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/metro-theme.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/dashboard-polish.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         window.STATIONS_META = {{ stations_meta | tojson | safe }};
@@ -53,7 +53,7 @@
                             <select name="station" id="station" class="form-select">
                                 {% for st in stations %}
                                     <option value="{{ st }}" {% if st == default_station %}selected{% endif %}>
-                                        {{ st }}{% if stations_meta[st].is_interchange %} ⇄ [Interchange]{% endif %}
+                                        {{ st }}{% if st in stations_meta and stations_meta[st].is_interchange %} ⇄ [Interchange]{% endif %}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+    <script src="{{ request.url_for('static', path='js/dashboard.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/theme.js') }}" defer></script>
 </body>
 </html>

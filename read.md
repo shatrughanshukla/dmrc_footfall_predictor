@@ -82,8 +82,8 @@ dmrc_footfall_predictor/
 │   ├── forecaster_metadata.joblib        # Encoders, historical means, features
 │   └── evaluation_metrics.json           # Validation metrics comparison report
 ├── app/
-│   ├── __init__.py                       # Flask application factory
-│   ├── routes.py                         # Web routes & REST API endpoints
+│   ├── __init__.py                       # FastAPI application and static-file mount
+│   ├── routes.py                         # FastAPI page routes and JSON API endpoints
 │   ├── forecasting.py                    # Real-time ML inference & 24h curves
 │   ├── scheduling_optimizer.py          # Transit frequency & headway optimizer
 │   ├── network_topology.py               # Line sequences & interchange definitions
@@ -102,8 +102,8 @@ dmrc_footfall_predictor/
 │       └── dmrc_logo.png
 ├── csvFiles/                             # Synced legacy files for backward compatibility
 ├── run.py                                # Application entry point
-├── requirements.txt                      # Dependencies (Flask, scikit-learn, pandas, etc.)
-└── Procfile                              # Gunicorn deployment configuration
+├── requirements.txt                      # Dependencies (FastAPI, scikit-learn, pandas, etc.)
+└── Procfile                              # Uvicorn deployment configuration
 ```
 
 See `DATA_AUDIT.md` for source discovery, schema/count audit, current data gaps, and use limitations.
@@ -131,7 +131,7 @@ See `DATA_AUDIT.md` for source discovery, schema/count audit, current data gaps,
    ```
 
 4. **Open the landing page**:
-   Navigate to `http://localhost:5000`, then choose **Open forecasting workspace** to use the dashboard at `/dashboard`.
+   Navigate to `http://localhost:5000`, then choose **Open forecasting workspace** to use the dashboard at `/dashboard`. Interactive API documentation is available at `/api/docs`.
 
 ---
 
@@ -139,5 +139,5 @@ See `DATA_AUDIT.md` for source discovery, schema/count audit, current data gaps,
 
 The application is fully compatible with **Render**, **Railway**, or containerized production hosting via the included `Procfile`:
 ```
-web: gunicorn run:app
+web: uvicorn run:app --host 0.0.0.0 --port $PORT
 ```
